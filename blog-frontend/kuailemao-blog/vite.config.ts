@@ -3,7 +3,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import viteCompression from 'vite-plugin-compression';
 import Components from 'unplugin-vue-components/vite'
 import {ElementPlusResolver} from 'unplugin-vue-components/resolvers'
-import { visualizer } from 'rollup-plugin-visualizer'
+import {visualizer} from 'rollup-plugin-visualizer'
 import vue from '@vitejs/plugin-vue'
 // 引入svg需要用到插件
 import {createSvgIconsPlugin} from 'vite-plugin-svg-icons'
@@ -77,8 +77,15 @@ export default defineConfig(({ mode }: ConfigEnv) => {
                 // 最小化拆分包， 将需要分离的包单独的打包出来
                 manualChunks(id) {
                     if (id.includes('node_modules')) {
-                        return id.toString().split('node_modules/')[1].split('/')[0].toString();
+                        const parts = id.toString().split('node_modules/');
+                        // 确保 split 结果有第二个元素
+                        if (parts.length > 1) {
+                            const packageNameAndPath = parts[1];
+                            // 确保 packageNameAndPath 不是空字符串，并获取包名
+                            return packageNameAndPath.split('/')[0];
+                        }
                     }
+                    return undefined; // 对于不符合条件的 id，返回 undefined
                 }
             }
         },

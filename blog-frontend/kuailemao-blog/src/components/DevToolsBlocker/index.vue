@@ -32,7 +32,7 @@ const props = defineProps({
   // 是否启用开发者工具禁用功能
   enableDevToolsBlocker: {
     type: Boolean,
-    default: true
+    default: false
   },
   // 警告消失时间（毫秒）
   autoDismissTime: {
@@ -50,7 +50,7 @@ const DEBUGGER_RESET_TIME = 5000;
 let debuggerResetTimeout: number | undefined;
 let continuousDebuggerEnabled = false;
 // 将环境变量字符串正确转换为布尔值
-const PROD_MODE = import.meta.env.VITE_ENABLE_DEV_TOOLSBLOCKER === 'true';
+const PROD_MODE = import.meta.env.VITE_ENABLE_DEV_TOOLSBLOCKER === 'false';
 
 // 连续执行debugger语句的递归函数
 function debuggerLoop() {

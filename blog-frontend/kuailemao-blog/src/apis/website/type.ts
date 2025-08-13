@@ -5,6 +5,7 @@ export default interface WebsiteInfo {
     webmasterProfileBackground: string;
     giteeLink: string;
     githubLink: string;
+    bilibiliLink: string;
     websiteName: string;
     headerNotification: string;
     sidebarAnnouncement: string;

@@ -18,7 +18,7 @@
     </h3>
     <h3>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;开源地址：<a href="https://gitee.com/kuailemao/ruyu-blog" target="_blank">https://gitee.com/kuailemao/ruyu-blog</a> |
-      <a href="https://github.com/kuailemao/Ruyu-Blog" target="_blank">https://github.com/kuailemao/Ruyu-Blog</a> ，
+      <a href="https://github.com/sgahch" target="_blank">https://github.com/kuailemao/Ruyu-Blog</a> ，
       该项目qq交流群：635887836，欢迎加入进行技术交流，技术学习。
     </h3>
     <h3>

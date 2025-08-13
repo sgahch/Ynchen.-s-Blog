@@ -17,9 +17,13 @@ const accountForm = ref<any>({
   avatar: ''
 })
 
-const avatarImg = ref()
+
 
 const userStore = useUserStore()
+
+const defaultAvatar = 'http://192.168.182.128:9000/blog/user/avatar/default.png'
+
+const avatarImg = ref(defaultAvatar)
 
 const emailForm = reactive({
   email: '',
@@ -48,7 +52,11 @@ const firstImg = ref('')
 const submitUploadAntUpdate = () => {
   if (firstImg.value !== avatarImg.value) {
     uploadRef.value!.submit()
-  } else updateUser()
+  } else {
+    // 没有上传新头像，使用默认头像地址
+    accountForm.value.avatar = defaultAvatar.trim()
+    updateUser()
+  }
 }
 
 const env = import.meta.env;
@@ -255,7 +263,10 @@ function getEmailCode(){
                     ref="uploadRef"
                     name="avatarFile"
                 >
-                  <img v-if="avatarImg" :src="avatarImg" class="avatar" alt="头像" style="border-radius: 50%"/>
+
+                  <img v-if="avatarImg" :src="avatarImg" class="avatar" alt="请上传头像" style="border-radius: 50%" />
+
+
                   <el-icon v-else class="avatar-uploader-icon">
                     <Plus/>
                   </el-icon>
