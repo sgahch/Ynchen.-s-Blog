@@ -1,175 +1,258 @@
-## 博客介绍
+# Ruyu-Blog 后端详细架构文档
 
-<p align="center">
-  <a href="https://www.kuailemao.xyz">
-    <img src="https://foruda.gitee.com/avatar/1667975309022664009/11937114_kuailemao_1667975308.png" alt="Ruyu的个人博客" style="border-radius: 50%;">
-  </a>
-</p>
+![GitHub 贡献贪吃蛇](https://raw.githubusercontent.com/yuaotian/yuaotian/refs/heads/output/github-contribution-grid-snake.svg)
 
-<p align="center">
-  基于 SpringBoot3 + Vue3 开发前后端分离个人博客系统
-</p>
+## 📋 项目概览
 
-## 项目部分截图
+**Ruyu-Blog** 是一个基于 Spring Boot 3.x 构建的现代化博客系统后端，采用**单体应用架构**设计，前后端分离部署。项目集成了完整的用户管理、内容管理、权限控制、消息队列、缓存系统等企业级功能模块。
 
-### 前台
+### 🏗️ 架构特点
 
-![前台首页](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E9%A6%96%E9%A1%B5.jpg)
+- **🏢 单体应用架构** - 采用传统的单体应用模式，所有功能模块集成在一个应用中
+- **🔄 前后端分离** - 后端提供RESTful API，前端独立部署
+- **📦 模块化设计** - 虽然是单体架构，但代码结构清晰，模块职责分明
+- **🚀 易于部署维护** - 单一部署单元，降低运维复杂度
+- **⚡ 高性能优化** - 通过缓存、消息队列等技术提升性能
 
-![前台中心](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E4%B8%AD%E5%BF%83.jpg)
+### 🏗️ 核心特性
 
-![前台文章](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E6%96%87%E7%AB%A0.jpg)
+- **🔐 完整的认证授权体系** - JWT + Spring Security + RBAC权限模型
+- **📝 丰富的内容管理功能** - 文章、评论、标签、分类、友链等
+- **🚀 高性能缓存策略** - Redis多级缓存 + 访问限流
+- **📨 异步消息处理** - RabbitMQ消息队列 + 邮件通知
+- **🛡️ 安全防护机制** - 黑名单系统 + IP限制 + 接口防刷
+- **📊 完善的日志监控** - AOP日志切面 + 操作审计
+- **🔧 灵活的配置管理** - 多环境配置 + 动态参数
+- **📦 容器化部署** - Docker支持 + 生产环境优化
 
-### 后台
+## 🛠️ 技术栈架构
 
-![后台发布文章](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%90%8E%E5%8F%B0%E5%8F%91%E5%B8%83%E6%96%87%E7%AB%A0.jpg)
+### 核心框架
+- **Spring Boot 3.1.4** - 主框架，提供自动配置和快速开发能力
+- **Spring Security 6.x** - 安全框架，处理认证和授权
+- **Spring AOP** - 面向切面编程，实现日志记录和权限控制
+- **MyBatis-Plus 3.5.3** - ORM框架，简化数据库操作
 
-![后台文章列表](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%90%8E%E5%8F%B0%E6%96%87%E7%AB%A0%E5%88%97%E8%A1%A8.jpg)
+### 数据存储
+- **MySQL 8.0+** - 主数据库，存储业务数据
+- **Redis 6.0+** - 缓存数据库，提供高性能数据访问
+- **MinIO** - 对象存储服务，处理文件上传和管理
 
-## 在线体验地址
-**注意：在线预览地址可能与仓库代码不同步，以仓库为主**
-> 服务器比较垃圾，随机可能崩掉，发现了会进行维护，且看且珍惜
+### 消息中间件
+- **RabbitMQ** - 消息队列，处理异步任务和解耦系统
 
-**前台博客：** https://kuailemao.xyz
+### 工具库
+- **Lombok** - 简化Java代码编写
+- **Hutool** - Java工具类库，提供丰富的工具方法
+- **FastJSON** - JSON处理库
+- **JWT** - 无状态身份验证
+- **Knife4j** - API文档生成和测试工具
 
-**后台管理：** https://blog.kuailemao.xyz
+### 架构说明
+- **🏢 单体应用架构** - 非微服务架构，所有功能集成在一个Spring Boot应用中
+- **📡 RESTful API** - 提供标准的REST接口，支持前后端分离
+- **🔄 异步处理** - 使用RabbitMQ处理邮件发送、日志记录等异步任务
+- **💾 数据持久化** - MySQL主数据库 + Redis缓存 + MinIO对象存储
+- **🛡️ 安全认证** - JWT + Spring Security实现无状态认证
 
-**测试账号：** Test，**密码：** 123456
+## 📁 项目结构详解
 
-**ps:** 测试账号功能不代表系统所有功能，有些权限过高模块不方便在线展示
+```
+blog-backend/
+├── src/main/java/xyz/kuailemao/
+│   ├── BlogBackendApplication.java          # 🚀 应用启动类
+│   ├── annotation/                          # 📝 自定义注解
+│   │   ├── AccessLimit.java                 # 接口访问限制注解
+│   │   ├── CheckBlacklist.java              # 黑名单检查注解
+│   │   └── LogAnnotation.java               # 日志记录注解
+│   ├── aop/                                 # 🔄 切面编程
+│   │   ├── AccessLimitAspect.java           # 访问限制切面
+│   │   ├── BlacklistAspect.java             # 黑名单检查切面
+│   │   └── LogAspect.java                   # 日志记录切面
+│   ├── config/                              # ⚙️ 配置类
+│   │   ├── SecurityConfig.java              # Spring Security配置
+│   │   ├── RedisConfig.java                 # Redis配置
+│   │   ├── RabbitConfig.java                # RabbitMQ配置
+│   │   ├── MinioConfig.java                 # MinIO配置
+│   │   ├── QuartzConfig.java                # 定时任务配置
+│   │   └── Knife4jConfig.java               # API文档配置
+│   ├── constants/                           # 📋 常量定义
+│   │   ├── SecurityConst.java               # 安全相关常量
+│   │   ├── RabbitConst.java                 # 消息队列常量
+│   │   └── RedisConst.java                  # Redis键名常量
+│   ├── controller/                          # 🎮 控制器层
+│   │   ├── ArticleController.java           # 文章管理接口
+│   │   ├── UserController.java              # 用户管理接口
+│   │   ├── CommentController.java           # 评论管理接口
+│   │   ├── CategoryController.java          # 分类管理接口
+│   │   ├── TagController.java               # 标签管理接口
+│   │   ├── LinkController.java              # 友链管理接口
+│   │   ├── TreeHoleController.java          # 树洞功能接口
+│   │   ├── LeaveWordController.java         # 留言板接口
+│   │   ├── BlackListController.java         # 黑名单管理接口
+│   │   ├── WebsiteInfoController.java       # 网站信息接口
+│   │   └── PublicController.java            # 公共接口
+│   ├── domain/                              # 📊 数据模型层
+│   │   ├── entity/                          # 实体类
+│   │   │   ├── User.java                    # 用户实体
+│   │   │   ├── Article.java                 # 文章实体
+│   │   │   ├── Comment.java                 # 评论实体
+│   │   │   ├── Category.java                # 分类实体
+│   │   │   ├── Tag.java                     # 标签实体
+│   │   │   ├── BlackList.java               # 黑名单实体
+│   │   │   └── ...                          # 其他实体类
+│   │   ├── dto/                             # 数据传输对象
+│   │   └── vo/                              # 视图对象
+│   ├── enums/                               # 📝 枚举类
+│   ├── exceptions/                          # ❌ 异常处理
+│   ├── filter/                              # 🔍 过滤器
+│   ├── handler/                             # 🛠️ 处理器
+│   ├── interceptor/                         # 🚧 拦截器
+│   ├── mapper/                              # 🗄️ 数据访问层
+│   ├── quartz/                              # ⏰ 定时任务
+│   ├── service/                             # 💼 业务逻辑层
+│   │   ├── impl/                            # 业务实现类
+│   │   └── ...                              # 业务接口
+│   ├── tasks/                               # 📋 启动任务
+│   └── utils/                               # 🔧 工具类
+├── src/main/resources/
+│   ├── application.yml                      # 主配置文件
+│   ├── application-dev.yml                  # 开发环境配置
+│   ├── application-prod.yml                 # 生产环境配置
+│   ├── mapper/                              # MyBatis映射文件
+│   ├── templates/                           # 邮件模板
+│   └── banner.txt                           # 启动横幅
+├── Dockerfile                               # Docker构建文件
+└── pom.xml                                  # Maven依赖配置
+```
 
-**Gitee地址：** https://gitee.com/kuailemao/ruyu-blog
+## 🏛️ 系统架构设计
 
-**Github地址：** https://github.com/kuailemao/Ruyu-Blog
+### 单体应用 vs 微服务
 
-**B站视频介绍：** https://www.bilibili.com/video/BV181hNeiEDb/?vd_source=ff1e09f5473622b91dc0efc92418b537#reply112716668797561
+**为什么选择单体架构？**
 
-**接口文档：** [API文档 (kuailemao.xyz)](http://kuailemao.xyz:8088/doc.html#/home)
+本项目采用单体应用架构而非微服务架构，主要考虑因素：
 
-**欢迎各位提交 PR ，一起改进项目**
+- **🎯 业务复杂度适中** - 博客系统功能相对集中，不需要复杂的服务拆分
+- **👥 团队规模较小** - 单体架构更适合小团队开发和维护
+- **🚀 快速迭代需求** - 避免微服务带来的分布式复杂性，专注业务开发
+- **💰 运维成本考虑** - 单体部署简单，降低基础设施和运维成本
+- **📈 性能要求** - 通过缓存和优化可以满足中等规模的访问需求
 
-## 运行环境
+**架构优势：**
+- ✅ 开发调试简单，本地运行完整功能
+- ✅ 部署运维简单，单一部署单元
+- ✅ 事务处理简单，避免分布式事务复杂性
+- ✅ 性能优异，避免网络调用开销
+- ✅ 技术栈统一，降低学习成本
 
-### 后端：
+### 分层架构模式
 
-|   名称   | 环境  |
-| :------: | :---: |
-|  MySQL   |  8.0  |
-|  Redis   | 7.2.3 |
-| RabbitMQ | 最新  |
-|  minio   | 最新  |
-|   JDK    |  17   |
+项目采用经典的三层架构模式，各层职责清晰分离：
 
-**前端：**
+**1. 表现层 (Controller Layer)**
+- 处理HTTP请求和响应
+- 参数验证和数据转换
+- 接口文档生成和测试支持
 
-| 名称 |  环境   |
-| :--: | :-----: |
-| pnpm | 8.12.0  |
-| node | 16.17.0 |
+**2. 业务逻辑层 (Service Layer)**
+- 核心业务逻辑处理
+- 事务管理和数据一致性
+- 缓存策略和性能优化
 
-## 项目部署
-**部署文档地址：** https://kuailemao.xyz/article/48
+**3. 数据访问层 (Mapper Layer)**
+- 数据库操作和SQL映射
+- 数据持久化和查询优化
+- 多数据源支持
 
-## 项目特点
+### 横切关注点
 
-* 前端参考了众多优秀博客大佬设计，页面美观，响应式布局
-* 后台管理基于 Antdv Pro 后台通用框架二次开发
-* 前后端分离，Docker Compose 一键部署
-* 采用 RABC 权限模型，使用 SpringSecurity 进行权限管理
-* 支持动态权限修改、动态菜单和路由
-* 文章、分类、标签、时间轴、树洞、留言板、聊天、友链等模块
-* 站长介绍、公告、电子时钟、随机文章、每日鸡汤、网站资讯
-* 支持代码高亮、图片预览、黑夜模式、点赞、收藏、评论等功能
-* 评论支持在线预览、Markdown、表情包
-* 发送友链申请、通过等自动发送邮件提醒
-* 接入第三方 gitee、github登录，减少注册成本
-* 文章编辑使用 Markdown 编辑器
-* 实现日志管理（操作、登录），服务监控、用户、菜单、角色、权限管理
-* 使用 自己搭建 minio 进行图片存储（避免了使用第三方对象存储被刷流量问题）
-* 使用 拦截器 + Redis 对接口进行了限流处理（每分钟）,后端使用 JSR 303 对参数校验，使用 Spring Aop + RabbitMQ 对后台操作日志处理
-* 采用 Restful 风格的 API，注释完善，后端代码使用了大量 stream 流编程方式，代码非常美观
-* ……
+**安全控制**
+- JWT身份验证
+- RBAC权限模型
+- 接口访问控制
 
-## 技术介绍
+**日志监控**
+- AOP统一日志记录
+- 操作审计追踪
+- 异常监控告警
 
-**前台前端（博客）：** Vue3 + Pinia +  Vue Router + TypeScript + Axios + Element Plus + Echarts……
+**性能优化**
+- Redis多级缓存
+- 接口访问限流
+- 数据库查询优化
 
-**后台启动（管理）：** Vue3 + Pinia +  Vue Router + TypeScript + Axios + Antdv Pro + Ant Design Vue……
+## 🔧 核心功能模块
 
-**后端：** JDK17 + SpringBoot3 + SpringSecurity + Mysql + Redis + Quartz  + RabbitMQ + Minio + Mybatis-Plus + Nginx + Docker……
+### 用户管理模块
+- **注册登录**: 支持邮箱注册、第三方登录(Gitee/GitHub)
+- **用户信息**: 个人资料管理、头像上传
+- **权限控制**: 基于角色的访问控制(RBAC)
 
-**其他：** Gitee、Github 第三方登录
+### 内容管理模块
+- **文章系统**: 文章发布、编辑、分类、标签
+- **评论系统**: 多级评论、回复通知
+- **友链管理**: 友链申请、审核、展示
 
-## 运行环境
+### 安全防护模块
+- **黑名单系统**: IP封禁、用户封禁
+- **访问限制**: 接口频率限制、防刷机制
+- **安全审计**: 登录日志、操作记录
 
-### 推荐
+### 系统监控模块
+- **日志管理**: 系统日志、操作日志
+- **性能监控**: 接口响应时间、系统资源
+- **异常处理**: 全局异常捕获、错误追踪
 
-> 最低 2 核 4 G
+## 🚀 快速开始
 
-**我的：** 腾讯云 2 核 2 G  4 M * 2  （穷）
+### 环境要求
+- JDK 17+
+- MySQL 8.0+
+- Redis 6.0+
+- RabbitMQ 3.8+
+- Maven 3.6+
 
-**系统：** **OpenCloudOS**
+### 配置说明
+详细的配置文件说明请参考 `application.yml` 中的注释，主要配置项包括：
+- 数据库连接配置
+- Redis缓存配置  
+- RabbitMQ消息队列配置
+- JWT安全配置
+- 文件存储配置
 
-**前端：** Docker   **后端：** jenkins
+### 启动步骤
+1. 克隆项目到本地
+2. 配置数据库和中间件连接信息
+3. 执行数据库初始化脚本
+4. 运行 `BlogBackendApplication.java`
+5. 访问 `http://localhost:8088/doc.html` 查看API文档
 
-## 后续计划（有空）
+## 🚨 常见问题解决
 
-> 白天上班，只能抽空优化项目，还望理解
+### 前端启动错误
+如果前端启动时遇到 `Cannot read properties of null (reading 'split')` 错误：
 
-- [x] 持续优化前台响应式
-- [x] 新增用户设置、支持修改邮箱、头像、昵称...
-- [x] 重构移动端首页
-- [x] 重构移动端文章页面
-- [x] 重构各种功能邮箱提醒(v1.4.1)
-- [ ] 实现后台导入导出
-- [x] 实现前台搜索
-- [x] 内置图片上传压缩
-- [x] 相册管理(v1.6.0)
-- [x] 前台添加更加有趣的效果
-- [x] 前台音乐播放器
-- [ ] 后台图片资源管理模块
-- [x] 找出并修复一些隐藏的bug(持续完善)
-- [x] 前端响应速度优化到网络正常的情况下5秒以内
-- [x] 实现黑名单管理机制
-- [ ] 后台首页数据大屏
-- [ ] 后台图片资源管理
-- [ ] 博客app版本
-- [ ] 博客小程序版本
+**问题原因**: 环境变量配置为空导致Vite代理配置失败
 
-## 项目总结
+**解决方案**:
+1. 检查 `blog-frontend/kuailemao-admin/.env.development` 文件
+2. 确保以下配置不为空：
+   ```bash
+   VITE_APP_BASE_URL=http://localhost:8088
+   VITE_APP_BASE_API=/api
+   VITE_APP_DOMAIN_NAME_FRONT=http://localhost:99
+   ```
+3. 重新启动前端项目
 
-整个项目花费了大量的时间与精力（尤其是前台前端），作者独自手写了三个月左右，除了后台的页面使用了一个后台框架模板外，其他的全部一点一点手写（包括后台的全部模块），这也是我第一次正式的开源一个项目（莫名成就感），虽然但是这个项目我并不觉得很完美，一部分是因为我自己技术有限的原因（主后端的全栈选手），一部分是项目还没经过时间的拷打，开发过程中也参考了很多优秀的项目，在这里感谢大家的开源项目，希望我的项目也能给你带来收获。
+### Git钩子问题
+如果遇到 `husky - .git can't be found` 错误：
+```bash
+cd 项目根目录
+git init  # 如果不是git仓库
+```
 
-### 鸣谢项目：
+---
 
-* [mrzym-blog](https://gitee.com/mrzym/stable-version-of-blog)
-
-* [掐指yi算’逢考必过-Blog](https://gitee.com/wu_shengdong/blog)
-
-* [hexo-theme-butterfly](https://github.com/jerryc127/hexo-theme-butterfly)
-
-* [Antdv Pro](https://docs.antdv-pro.com/)
-
-* [md-editor-v3](https://imzbf.github.io/md-editor-v3/zh-CN/index)
-
-* [vue-danmaku](https://github.com/hellodigua/vue-danmaku)
-
-* ……
-
-#### Heo表情包开源地址
-* https://github.com/zhheo/Sticker-Heo
-
-## 最后
-
-**该文档初次编写可能存在一些问题，如果发现，后面会进行修改提交**
-
-### <u>如果对你有益，麻烦点个star支持项目，能让项目得到更多关注，谢谢！！！</u>
-
-**该项目交流群：** （有什么不懂的可以提问）
-
-**QQ：** 635887836
-
-**二维码：**
-
-<img src="https://gitee.com/kuailemao/ruyu-blog/raw/master/img/Ruyu开源博客交流群群聊二维码.png" />
-
+*本文档持续更新中，如有问题请提交Issue或联系维护者*
