@@ -203,23 +203,71 @@ public class JwtUtils {
     private PermissionMapper permissionMapper;
 
     // 查询jwt角色&权限
+//    private List<String> getAuthorities(Long userId) {
+//        // 查询用户角色
+//        List<UserRole> userRoles = userRoleMapper.selectList(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId, userId));
+//        List<Role> roles = userRoles.stream().map(role -> roleMapper.selectById(role.getRoleId())).toList();
+//        if (roles.isEmpty()){
+//            return Collections.emptyList();
+//        }else{
+//            // 查询权限关系表
+//            List<RolePermission> rolePermissions = rolePermissionMapper.selectBatchIds(roles.stream().map(Role::getId).toList());
+//            // 查询角色权限
+//            List<Long> pIds = rolePermissions.stream().map(RolePermission::getPermissionId).toList();
+//            List<Permission> permissions = permissionMapper.selectBatchIds(pIds);
+//            // 组合角色，权限
+//            List<String> list = permissions.stream().map(Permission::getPermissionKey).collect(Collectors.toList());
+//            roles.forEach(role -> list.add(SecurityConst.ROLE_PREFIX + role.getRoleKey()));
+//            list.addAll(roles.stream().map(Role::getRoleKey).toList());
+//            return list;
+//        }
+//    }
     private List<String> getAuthorities(Long userId) {
         // 查询用户角色
-        List<UserRole> userRoles = userRoleMapper.selectList(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId, userId));
-        List<Role> roles = userRoles.stream().map(role -> roleMapper.selectById(role.getRoleId())).toList();
-        if (roles.isEmpty()){
+        List<UserRole> userRoles = userRoleMapper.selectList(
+                new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId, userId)
+        );
+        if (userRoles.isEmpty()) {
             return Collections.emptyList();
-        }else{
-            // 查询权限关系表
-            List<RolePermission> rolePermissions = rolePermissionMapper.selectBatchIds(roles.stream().map(Role::getId).toList());
-            // 查询角色权限
-            List<Long> pIds = rolePermissions.stream().map(RolePermission::getPermissionId).toList();
-            List<Permission> permissions = permissionMapper.selectBatchIds(pIds);
-            // 组合角色，权限
-            List<String> list = permissions.stream().map(Permission::getPermissionKey).collect(Collectors.toList());
-            roles.forEach(role -> list.add(SecurityConst.ROLE_PREFIX + role.getRoleKey()));
-            list.addAll(roles.stream().map(Role::getRoleKey).toList());
-            return list;
         }
+        List<Long> roleIds = userRoles.stream()
+                .map(UserRole::getRoleId)
+                .toList();
+        List<Role> roles = roleMapper.selectBatchIds(roleIds);
+        if (roles.isEmpty()) {
+            return Collections.emptyList();
+        }
+        // 查询角色权限关系
+        List<RolePermission> rolePermissions = rolePermissionMapper.selectBatchIds(roleIds);
+        if (rolePermissions.isEmpty()) {
+            return roles.stream()
+                    .map(r -> SecurityConst.ROLE_PREFIX + r.getRoleKey())
+                    .toList();
+        }
+        // 过滤非空权限 ID
+        List<Long> pIds = rolePermissions.stream()
+                .map(RolePermission::getPermissionId)
+                .filter(Objects::nonNull)
+                .toList();
+        if (pIds.isEmpty()) {
+            return roles.stream()
+                    .map(r -> SecurityConst.ROLE_PREFIX + r.getRoleKey())
+                    .toList();
+        }
+        // 查询权限
+        List<Permission> permissions = permissionMapper.selectBatchIds(pIds);
+        // 组装结果
+        List<String> authorities = new ArrayList<>();
+        authorities.addAll(
+                permissions.stream()
+                        .map(Permission::getPermissionKey)
+                        .toList()
+        );
+        authorities.addAll(
+                roles.stream()
+                        .map(r -> SecurityConst.ROLE_PREFIX + r.getRoleKey())
+                        .toList()
+        );
+        return authorities;
     }
 }

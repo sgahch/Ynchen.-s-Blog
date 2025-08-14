@@ -42,29 +42,68 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Resource
     private MenuMapper menuMapper;
 
+//    @Override
+//    public List<PermissionVO> selectPermission(String permissionDesc, String permissionKey, Long permissionMenuId) {
+//        LambdaQueryWrapper<Permission> wrapper = new LambdaQueryWrapper<>();
+//        wrapper.like(Objects.nonNull(permissionDesc), Permission::getPermissionDesc, permissionDesc)
+//                .like(Objects.nonNull(permissionKey), Permission::getPermissionKey, permissionKey)
+//                .eq(Objects.nonNull(permissionMenuId), Permission::getMenuId, permissionMenuId);
+//        List<Permission> permissions = permissionMapper.selectList(wrapper);
+//
+//        if (!permissions.isEmpty()) {
+//            List<Menu> menus = menuMapper.selectBatchIds(permissions.stream().map(Permission::getMenuId).toList());
+//            return permissions.stream().map(permission -> permission.asViewObject(PermissionVO.class, v -> {
+//                Optional<Menu> menu = menus.stream().filter(m -> m.getId().equals(permission.getMenuId())).findFirst();
+//                menu.ifPresent(m -> v.setMenuName(m.getTitle()));
+//            })).toList();
+//        }
+//        return new ArrayList<>();
+//    }
+
     @Override
     public List<PermissionVO> selectPermission(String permissionDesc, String permissionKey, Long permissionMenuId) {
         LambdaQueryWrapper<Permission> wrapper = new LambdaQueryWrapper<>();
-        wrapper.like(Objects.nonNull(permissionDesc), Permission::getPermissionDesc, permissionDesc)
-                .like(Objects.nonNull(permissionKey), Permission::getPermissionKey, permissionKey)
-                .eq(Objects.nonNull(permissionMenuId), Permission::getMenuId, permissionMenuId);
-        List<Permission> permissions = permissionMapper.selectList(wrapper);
+        wrapper.like(StringUtils.isNotBlank(permissionDesc), Permission::getPermissionDesc, permissionDesc)
+                .like(StringUtils.isNotBlank(permissionKey), Permission::getPermissionKey, permissionKey)
+                .eq(permissionMenuId != null, Permission::getMenuId, permissionMenuId);
 
-        if (!permissions.isEmpty()) {
-            List<Menu> menus = menuMapper.selectBatchIds(permissions.stream().map(Permission::getMenuId).toList());
-            return permissions.stream().map(permission -> permission.asViewObject(PermissionVO.class, v -> {
-                Optional<Menu> menu = menus.stream().filter(m -> m.getId().equals(permission.getMenuId())).findFirst();
-                menu.ifPresent(m -> v.setMenuName(m.getTitle()));
-            })).toList();
-        }
-        return new ArrayList<>();
+        List<Permission> permissions = permissionMapper.selectList(wrapper);
+        if (permissions.isEmpty()) return List.of();
+
+        List<Long> menuIds = permissions.stream()
+                .map(Permission::getMenuId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        if (menuIds.isEmpty()) return List.of();
+
+        List<Menu> menus = menuMapper.selectBatchIds(menuIds);
+
+        return permissions.stream()
+                .map(p -> p.asViewObject(PermissionVO.class, v -> {
+                    menus.stream()
+                            .filter(m -> m.getId().equals(p.getMenuId()))
+                            .findFirst()
+                            .ifPresent(m -> v.setMenuName(m.getTitle()));
+                }))
+                .toList();
     }
 
     @Override
     public List<PermissionMenuVO> selectPermissionMenu() {
         List<Permission> permissions = permissionMapper.selectList(null);
         if (!permissions.isEmpty()) {
-            List<Menu> menus = menuMapper.selectBatchIds(permissions.stream().map(Permission::getMenuId).toList());
+
+            // 去重
+            List<Long> menuIds = permissions.stream()
+                    .map(Permission::getMenuId)
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .toList();
+
+            List<Menu> menus = menuIds.isEmpty() ? List.of() : menuMapper.selectBatchIds(menuIds);
+
             List<PermissionMenuVO> vos = permissions.stream().map(permission -> permission.asViewObject(PermissionMenuVO.class, v -> {
                 Optional<Menu> menu = menus.stream().filter(m -> m.getId().equals(permission.getMenuId())).findFirst();
                 menu.ifPresent(m -> {
