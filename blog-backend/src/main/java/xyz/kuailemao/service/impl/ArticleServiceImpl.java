@@ -8,6 +8,9 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -76,6 +79,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Resource
     private CommentMapper commentMapper;
+
+    @Resource
+    private CacheManager cacheManager;
 
 
     @Override
@@ -152,8 +158,16 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 .toList();
     }
 
+    /**
+     * 获取文章详情
+     *
+     * @param id 文章id
+     * @return 文章详情
+     */
+    @Cacheable(cacheNames = "article", key = "'detail:' + #id")
     @Override
     public ArticleDetailVO getArticleDetail(Integer id) {
+        log.info("=========== 从数据库查询文章详情: {} ============", id);
         Article article = articleMapper.selectOne(new LambdaQueryWrapper<Article>().eq(Article::getStatus, SQLConst.PUBLIC_ARTICLE).and(i -> i.eq(Article::getId, id)));
         if (StringUtils.isNull(article)) return null;
         // 文章分类
@@ -267,12 +281,28 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     public ResponseResult<Void> publish(ArticleDTO articleDTO) {
         Article article = articleDTO.asViewObject(Article.class, v -> v.setUserId(SecurityUtils.getUserId()));
+
+        // 判断是新增还是更新
+        boolean isUpdate = article.getId() != null;
+
         if (this.saveOrUpdate(article)) {
+
             // 清除标签关系
             articleTagMapper.deleteById(article.getId());
             // 新增标签关系
             List<ArticleTag> articleTags = articleDTO.getTagId().stream().map(articleTag -> ArticleTag.builder().articleId(article.getId()).tagId(articleTag).build()).toList();
             articleTagService.saveBatch(articleTags);
+
+            // 如果是更新操作，则清除缓存
+            if (isUpdate) {
+                Cache articleCache = cacheManager.getCache("article");
+                if (articleCache != null) {
+                    String cacheKey = "detail:" + article.getId();
+                    log.info("=========== 更新文章，清除缓存: {} ============", cacheKey);
+                    articleCache.evict(cacheKey);
+                }
+            }
+            log.info("=========== 发布文章成功: {} ============", article.getId());
             return ResponseResult.success();
         }
         return ResponseResult.failure();
@@ -374,6 +404,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         return null;
     }
 
+
     @Transactional
     @Override
     public ResponseResult<Void> deleteArticle(List<Long> ids) {
@@ -384,6 +415,22 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             likeMapper.delete(new LambdaQueryWrapper<Like>().eq(Like::getType, LikeEnum.LIKE_TYPE_ARTICLE.getType()).and(a -> a.in(Like::getTypeId, ids)));
             favoriteMapper.delete(new LambdaQueryWrapper<Favorite>().eq(Favorite::getType, FavoriteEnum.FAVORITE_TYPE_ARTICLE.getType()).and(a -> a.in(Favorite::getTypeId, ids)));
             commentMapper.delete(new LambdaQueryWrapper<Comment>().eq(Comment::getType, CommentEnum.COMMENT_TYPE_ARTICLE.getType()).and(a -> a.in(Comment::getTypeId, ids)));
+
+            // --- 手动清除缓存开始 ---
+            if (ids != null && !ids.isEmpty()) {
+                // 1. 获取名为 "article" 的缓存区
+                Cache articleCache = cacheManager.getCache("article");
+                if (articleCache != null) {
+                    // 2. 遍历ID列表，逐个清除缓存
+                    ids.forEach(id -> {
+                        String cacheKey = "detail:" + id;
+                        log.info("=========== 清除文章详情缓存: {} ============", cacheKey);
+                        articleCache.evict(cacheKey);
+                    });
+                }
+            }
+            // --- 手动清除缓存结束 ---
+
             return ResponseResult.success();
         }
         return ResponseResult.failure();

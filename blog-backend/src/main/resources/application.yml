@@ -4,3 +4,7 @@ spring:
   profiles:
     #active: dev
     active: prod
+  cache:
+    type: redis
+    redis:
+      time-to-live: 1200000  #默认缓存时间 20分钟
