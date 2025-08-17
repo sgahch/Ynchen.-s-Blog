@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,39 +85,59 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private CacheManager cacheManager;
 
 
+    // 在 ArticleServiceImpl.java 中
+    // 确保已经导入了 @Cacheable, Collectors, Collections 等
+
     @Override
+    @Cacheable(cacheNames = "article", key = "'list:page:' + #pageNum + ':' + #pageSize")
     public PageVO<List<ArticleVO>> listAllArticle(Integer pageNum, Integer pageSize) {
-        boolean hasKey = redisCache.isHasKey(RedisConst.ARTICLE_COMMENT_COUNT) && redisCache.isHasKey(RedisConst.ARTICLE_FAVORITE_COUNT) && redisCache.isHasKey(RedisConst.ARTICLE_LIKE_COUNT);
-        // 文章
+        log.info("=========== 从数据库查询前台文章列表: 页码 {}, 每页数量 {} ============", pageNum, pageSize);
+
+        // 1. 分页查询文章 (1次SQL)
         Page<Article> page = new Page<>(pageNum, pageSize);
-        this.page(page, new LambdaQueryWrapper<Article>().eq(Article::getStatus, SQLConst.PUBLIC_ARTICLE).orderByDesc(Article::getCreateTime));
-        List<Article> list = page.getRecords();
-        // 文章分类
-        // 1. 优化：使用 Map 存储分类和标签信息，避免 N+1 问题
-        Map<Long, String> categoryMap = categoryMapper.selectBatchIds(list.stream().map(Article::getCategoryId).toList())
-                .stream().collect(Collectors.toMap(Category::getId, Category::getCategoryName));
+        this.page(page, new LambdaQueryWrapper<Article>()
+                .eq(Article::getStatus, SQLConst.PUBLIC_ARTICLE)
+                .orderByDesc(Article::getCreateTime));
 
-        List<ArticleTag> articleTags = articleTagMapper.selectBatchIds(list.stream().map(Article::getId).toList());
-        Map<Long, String> tagMap = tagMapper.selectBatchIds(articleTags.stream().map(ArticleTag::getTagId).toList())
-                .stream().collect(Collectors.toMap(Tag::getId, Tag::getTagName));
+        List<Article> articles = page.getRecords();
+        if (articles.isEmpty()) {
+            return new PageVO<>(Collections.emptyList(), 0L);
+        }
 
-        List<ArticleVO> articleVOS = list.stream().map(article -> {
+        List<Long> articleIds = articles.stream().map(Article::getId).toList();
+
+        // 2. 批量获取所有需要的关联数据
+        // (1) 批量获取分类 (1次SQL)
+        Map<Long, String> categoryMap = categoryMapper.selectBatchIds(
+                        articles.stream().map(Article::getCategoryId).distinct().toList()
+                ).stream()
+                .collect(Collectors.toMap(Category::getId, Category::getCategoryName));
+
+        // (2) 批量获取标签 (1次SQL)
+        List<Map<String, Object>> tagResults = articleTagMapper.selectTagsByArticleIds(articleIds);
+        Map<Long, List<String>> articleTagsMap = tagResults.stream()
+                .collect(Collectors.groupingBy(
+                        map -> ((Number) map.get("article_id")).longValue(),
+                        Collectors.mapping(map -> (String) map.get("tag_name"), Collectors.toList())
+                ));
+
+        // 3. 在内存中高效组装数据
+        List<ArticleVO> articleVOS = articles.stream().map(article -> {
             ArticleVO articleVO = article.asViewObject(ArticleVO.class);
-            // 2. 优化：使用 Map 获取分类和标签信息
             articleVO.setCategoryName(categoryMap.get(article.getCategoryId()));
-            articleVO.setTags(articleTags.stream()
-                    .filter(at -> Objects.equals(at.getArticleId(), article.getId()))
-                    .map(at -> tagMap.get(at.getTagId()))
-                    .toList());
+            // 直接从Map中获取标签列表，如果某篇文章没有标签，getOrDefault会返回一个空列表
+            articleVO.setTags(articleTagsMap.getOrDefault(article.getId(), Collections.emptyList()));
             return articleVO;
         }).toList();
 
+        // 4. (可选) 从Redis中获取并设置互动计数 (这部分您的逻辑已经很好了，可以保留)
+        boolean hasKey = redisCache.isHasKey(RedisConst.ARTICLE_COMMENT_COUNT) && redisCache.isHasKey(RedisConst.ARTICLE_FAVORITE_COUNT) && redisCache.isHasKey(RedisConst.ARTICLE_LIKE_COUNT);
         if (hasKey) {
-            articleVOS = articleVOS.stream().peek(articleVO -> {
+            articleVOS.forEach(articleVO -> {
                 setArticleCount(articleVO, RedisConst.ARTICLE_FAVORITE_COUNT, CountTypeEnum.FAVORITE);
                 setArticleCount(articleVO, RedisConst.ARTICLE_LIKE_COUNT, CountTypeEnum.LIKE);
                 setArticleCount(articleVO, RedisConst.ARTICLE_COMMENT_COUNT, CountTypeEnum.COMMENT);
-            }).toList();
+            });
         }
 
         return new PageVO<>(articleVOS, page.getTotal());
@@ -299,7 +320,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 if (articleCache != null) {
                     String cacheKey = "detail:" + article.getId();
                     log.info("=========== 更新文章，清除缓存: {} ============", cacheKey);
-                    articleCache.evict(cacheKey);
+//                    articleCache.evict(cacheKey);
+                    articleCache.clear();
                 }
             }
             log.info("=========== 发布文章成功: {} ============", article.getId());
@@ -317,6 +339,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             // 提取图片名称
             String articleCoverName = articleCoverUrl.substring(articleCoverUrl.indexOf(bucketName) + bucketName.length());
             fileUploadUtils.deleteFiles(List.of(articleCoverName));
+            log.info("=========== 删除文章封面成功: {} ============", articleCoverName);
             return ResponseResult.success();
         } catch (Exception e) {
             log.error("删除文章封面失败", e);
@@ -338,23 +361,90 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         return null;
     }
 
+//    重构 `listArticle()` 和 `searchArticle()`**：这是**最重要**的一步。请务必将“批量查询+内存组装”的优化模式应用到这两个方法上，消除最后的N+1性能瓶-颈。
+//    @Override     N+1版本
+//    public List<ArticleListVO> listArticle() {
+////        List<ArticleListVO> articleListVOS = articleMapper.selectList(new LambdaQueryWrapper<Article>()
+////                .orderByDesc(Article::getCreateTime)).stream().map(article -> article.asViewObject(ArticleListVO.class)).toList();
+////        if (!articleListVOS.isEmpty()) {
+////            articleListVOS.forEach(articleListVO -> {
+////                articleListVO.setCategoryName(categoryMapper.selectById(articleListVO.getCategoryId()).getCategoryName());
+////                articleListVO.setUserName(userMapper.selectById(articleListVO.getUserId()).getUsername());
+////                // 查询文章标签
+////                List<Long> tagIds = articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>().eq(ArticleTag::getArticleId, articleListVO.getId())).stream().map(ArticleTag::getTagId).toList();
+////                articleListVO.setTagsName(tagMapper.selectBatchIds(tagIds).stream().map(Tag::getTagName).toList());
+////            });
+////            return articleListVOS;
+////        }
+////        return null;
+
+
     @Override
+    // (可选) 为后台列表添加缓存
+    @Cacheable(cacheNames = "article", key = "'back:list'")
     public List<ArticleListVO> listArticle() {
-        List<ArticleListVO> articleListVOS = articleMapper.selectList(new LambdaQueryWrapper<Article>()
-                .orderByDesc(Article::getCreateTime)).stream().map(article -> article.asViewObject(ArticleListVO.class)).toList();
-        if (!articleListVOS.isEmpty()) {
-            articleListVOS.forEach(articleListVO -> {
-                articleListVO.setCategoryName(categoryMapper.selectById(articleListVO.getCategoryId()).getCategoryName());
-                articleListVO.setUserName(userMapper.selectById(articleListVO.getUserId()).getUsername());
-                // 查询文章标签
-                List<Long> tagIds = articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>().eq(ArticleTag::getArticleId, articleListVO.getId())).stream().map(ArticleTag::getTagId).toList();
-                articleListVO.setTagsName(tagMapper.selectBatchIds(tagIds).stream().map(Tag::getTagName).toList());
-            });
-            return articleListVOS;
+        log.info("=========== 从数据库查询后台文章列表 ============");
+
+        // 1. 一次性查询出所有文章 (1次SQL)
+        List<Article> articles = this.list(new LambdaQueryWrapper<Article>().orderByDesc(Article::getCreateTime));
+        if (articles.isEmpty()) {
+            return Collections.emptyList();
         }
-        return null;
+
+        // 2. 准备好需要查询的ID集合
+        List<Long> articleIds = articles.stream().map(Article::getId).toList();
+        // 使用 distinct() 去重，减少查询量
+        List<Long> userIds = articles.stream().map(Article::getUserId).distinct().toList();
+        List<Long> categoryIds = articles.stream().map(Article::getCategoryId).distinct().toList();
+
+        // 3. 批量获取所有需要的关联数据 (只需3次SQL)
+        // (1) 批量获取分类信息
+        Map<Long, String> categoryMap = categoryMapper.selectBatchIds(categoryIds)
+                .stream().collect(Collectors.toMap(Category::getId, Category::getCategoryName));
+
+        // (2) 批量获取用户信息
+        Map<Long, String> userMap = userMapper.selectBatchIds(userIds)
+                .stream().collect(Collectors.toMap(User::getId, User::getUsername));
+
+        // (3) 批量获取所有文章的标签关系及标签名 (这里可以使用我们之前创建的高效JOIN查询)
+        List<Map<String, Object>> tagResults = articleTagMapper.selectTagsByArticleIds(articleIds);
+        Map<Long, List<String>> articleTagsMap = tagResults.stream()
+                .collect(Collectors.groupingBy(
+                        map -> ((Number) map.get("article_id")).longValue(),
+                        Collectors.mapping(map -> (String) map.get("tag_name"), Collectors.toList())
+                ));
+
+        // 4. 在内存中高效组装最终的VO列表
+        return articles.stream().map(article -> {
+            ArticleListVO vo = article.asViewObject(ArticleListVO.class);
+            // 从Map中获取数据，O(1)复杂度
+            vo.setCategoryName(categoryMap.get(article.getCategoryId()));
+            vo.setUserName(userMap.get(article.getUserId()));
+            vo.setTagsName(articleTagsMap.getOrDefault(article.getId(), Collections.emptyList()));
+            return vo;
+        }).toList();
     }
 
+//    @Override   N+1版本
+//    public List<ArticleListVO> searchArticle(SearchArticleDTO searchArticleDTO) {
+//        LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
+//        wrapper.like(StringUtils.isNotNull(searchArticleDTO.getArticleTitle()), Article::getArticleTitle, searchArticleDTO.getArticleTitle())
+//                .eq(StringUtils.isNotNull(searchArticleDTO.getCategoryId()), Article::getCategoryId, searchArticleDTO.getCategoryId())
+//                .eq(StringUtils.isNotNull(searchArticleDTO.getStatus()), Article::getStatus, searchArticleDTO.getStatus())
+//                .eq(StringUtils.isNotNull(searchArticleDTO.getIsTop()), Article::getIsTop, searchArticleDTO.getIsTop());
+//        List<ArticleListVO> articleListVOS = articleMapper.selectList(wrapper).stream().map(article -> article.asViewObject(ArticleListVO.class)).toList();
+//        if (!articleListVOS.isEmpty()) {
+//            articleListVOS.forEach(articleListVO -> {
+//                articleListVO.setCategoryName(categoryMapper.selectById(articleListVO.getCategoryId()).getCategoryName());
+//                articleListVO.setUserName(userMapper.selectById(articleListVO.getUserId()).getUsername());
+//                // 查询文章标签
+//                List<Long> tagIds = articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>().eq(ArticleTag::getArticleId, articleListVO.getId())).stream().map(ArticleTag::getTagId).toList();
+//                articleListVO.setTagsName(tagMapper.selectBatchIds(tagIds).stream().map(Tag::getTagName).toList());
+//            });
+//            return articleListVOS;
+//        }
+//        return null;
+//    }
     @Override
     public List<ArticleListVO> searchArticle(SearchArticleDTO searchArticleDTO) {
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
@@ -362,21 +452,42 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 .eq(StringUtils.isNotNull(searchArticleDTO.getCategoryId()), Article::getCategoryId, searchArticleDTO.getCategoryId())
                 .eq(StringUtils.isNotNull(searchArticleDTO.getStatus()), Article::getStatus, searchArticleDTO.getStatus())
                 .eq(StringUtils.isNotNull(searchArticleDTO.getIsTop()), Article::getIsTop, searchArticleDTO.getIsTop());
-        List<ArticleListVO> articleListVOS = articleMapper.selectList(wrapper).stream().map(article -> article.asViewObject(ArticleListVO.class)).toList();
-        if (!articleListVOS.isEmpty()) {
-            articleListVOS.forEach(articleListVO -> {
-                articleListVO.setCategoryName(categoryMapper.selectById(articleListVO.getCategoryId()).getCategoryName());
-                articleListVO.setUserName(userMapper.selectById(articleListVO.getUserId()).getUsername());
-                // 查询文章标签
-                List<Long> tagIds = articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>().eq(ArticleTag::getArticleId, articleListVO.getId())).stream().map(ArticleTag::getTagId).toList();
-                articleListVO.setTagsName(tagMapper.selectBatchIds(tagIds).stream().map(Tag::getTagName).toList());
-            });
-            return articleListVOS;
+
+        // 1. 根据搜索条件查询文章 (1次SQL)
+        List<Article> articles = articleMapper.selectList(wrapper);
+        if (articles.isEmpty()) {
+            return Collections.emptyList();
         }
-        return null;
+
+        // 2. 和 listArticle() 完全相同的批量查询与组装逻辑
+        List<Long> articleIds = articles.stream().map(Article::getId).toList();
+        List<Long> userIds = articles.stream().map(Article::getUserId).distinct().toList();
+        List<Long> categoryIds = articles.stream().map(Article::getCategoryId).distinct().toList();
+
+        Map<Long, String> categoryMap = categoryMapper.selectBatchIds(categoryIds)
+                .stream().collect(Collectors.toMap(Category::getId, Category::getCategoryName));
+        Map<Long, String> userMap = userMapper.selectBatchIds(userIds)
+                .stream().collect(Collectors.toMap(User::getId, User::getUsername));
+
+        List<Map<String, Object>> tagResults = articleTagMapper.selectTagsByArticleIds(articleIds);
+        Map<Long, List<String>> articleTagsMap = tagResults.stream()
+                .collect(Collectors.groupingBy(
+                        map -> ((Number) map.get("article_id")).longValue(),
+                        Collectors.mapping(map -> (String) map.get("tag_name"), Collectors.toList())
+                ));
+
+        // 3. 内存中组装
+        return articles.stream().map(article -> {
+            ArticleListVO vo = article.asViewObject(ArticleListVO.class);
+            vo.setCategoryName(categoryMap.get(article.getCategoryId()));
+            vo.setUserName(userMap.get(article.getUserId()));
+            vo.setTagsName(articleTagsMap.getOrDefault(article.getId(), Collections.emptyList()));
+            return vo;
+        }).toList();
     }
 
     @Override
+    @CacheEvict(cacheNames = "article", allEntries = true)
     public ResponseResult<Void> updateStatus(Long id, Integer status) {
         if (this.update(new LambdaUpdateWrapper<Article>().eq(Article::getId, id).set(Article::getStatus, status))) {
             return ResponseResult.success();
@@ -385,6 +496,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     @Override
+    @CacheEvict(cacheNames = "article", allEntries = true)
     public ResponseResult<Void> updateIsTop(Long id, Integer isTop) {
         if (this.update(new LambdaUpdateWrapper<Article>().eq(Article::getId, id).set(Article::getIsTop, isTop))) {
             return ResponseResult.success();

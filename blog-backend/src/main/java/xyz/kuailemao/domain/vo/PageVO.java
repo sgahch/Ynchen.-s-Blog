@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * @author kuailemao
  * <p>
@@ -17,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Schema(name = "PageVO", description = "分页VO")
-public class PageVO<T> {
+public class PageVO<T> implements Serializable {
 
     /**
      * 数据

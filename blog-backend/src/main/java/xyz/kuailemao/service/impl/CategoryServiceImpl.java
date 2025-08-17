@@ -56,7 +56,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         // 2. 用GROUP BY查所有计数 (1次SQL)
         Map<Long, Map<String, Object>> countMapResult = articleMapper.selectArticleCountByCategoryId();
         Map<Long, Long> articleCountMap = countMapResult.entrySet().stream()
-                .collect(Collectors.toMap(  
+                .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         entry -> ((Number) entry.getValue().get("article_count")).longValue()
                 ));
