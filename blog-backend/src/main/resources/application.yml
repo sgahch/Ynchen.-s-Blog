@@ -2,8 +2,8 @@ server:
   port: 8088
 spring:
   profiles:
-    #active: dev
-    active: prod
+    active: dev
+    #active: prod
   cache:
     type: redis
     redis:

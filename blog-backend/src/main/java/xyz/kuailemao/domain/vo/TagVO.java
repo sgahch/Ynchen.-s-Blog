@@ -3,6 +3,7 @@ package xyz.kuailemao.domain.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 
@@ -13,7 +14,7 @@ import java.util.Date;
  */
 @Data
 @Schema(name = "TagVO", description = "标签VO")
-public class TagVO {
+public class TagVO implements Serializable {
     //标签id
     private Long id;
     //标签名称
