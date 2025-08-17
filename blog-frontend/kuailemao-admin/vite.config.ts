@@ -13,6 +13,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
   const env = loadEnv(mode, process.cwd())
   return {
     plugins: createVitePlugins(env),
+    base: '/admin/',
     resolve: {
       alias: [
         {

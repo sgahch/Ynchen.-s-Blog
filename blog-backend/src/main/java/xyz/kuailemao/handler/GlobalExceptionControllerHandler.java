@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.enums.RespEnum;
 import xyz.kuailemao.exceptions.BlackListException;
+import xyz.kuailemao.exceptions.DuplicateSubmitException;
 import xyz.kuailemao.exceptions.FileUploadException;
 
 import java.util.Objects;
@@ -52,6 +53,15 @@ public class GlobalExceptionControllerHandler {
     public ResponseResult<Void> handlerBlackListException(BlackListException e){
         log.error("黑名单异常:{}({})", e.getMessage(), e.getStackTrace());
         return ResponseResult.failure(RespEnum.BLACK_LIST_ERROR.getCode(), e.getMessage());
+    }
+    /**
+     * 处理重复提交异常
+     */
+    @ExceptionHandler(DuplicateSubmitException.class)
+    public ResponseResult<Void> handleDuplicateSubmitException(DuplicateSubmitException e) {
+        log.warn("捕获到重复提交异常: {}", e.getMessage());
+        // 您可以定义一个专门的错误码，比如 429 (Too Many Requests)
+        return ResponseResult.failure(429, e.getMessage());
     }
 
     // 最大的异常，防止出现其他不明异常无法处理

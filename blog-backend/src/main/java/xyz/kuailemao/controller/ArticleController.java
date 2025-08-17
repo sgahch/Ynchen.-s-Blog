@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.kuailemao.annotation.AccessLimit;
 import xyz.kuailemao.annotation.LogAnnotation;
+import xyz.kuailemao.annotation.PreventDuplicateSubmit;
 import xyz.kuailemao.constants.LogConst;
 import xyz.kuailemao.domain.dto.ArticleDTO;
 import xyz.kuailemao.domain.dto.SearchArticleDTO;
@@ -78,7 +79,6 @@ public class ArticleController {
     public ResponseResult<List<HotArticleVO>> hot() {
         return ControllerUtils.messageHandler(() -> articleService.listHotArticle());
     }
-
 
     @Operation(summary = "获取所有的文章列表")
     @AccessLimit(seconds = 60, maxCount = 10)
@@ -160,6 +160,7 @@ public class ArticleController {
         return ControllerUtils.messageHandler(() -> null);
     }
 
+    @PreventDuplicateSubmit(expire = 10)
     @PreAuthorize("hasAnyAuthority('blog:publish:article')")
     @Operation(summary = "上传文章封面")
     @Parameter(name = "articleCover", description = "文章封面")
@@ -170,6 +171,7 @@ public class ArticleController {
         return articleService.uploadArticleCover(articleCover);
     }
 
+    @PreventDuplicateSubmit(expire = 10)
     @PreAuthorize("hasAnyAuthority('blog:publish:article')")
     @Operation(summary = "发布文章")
     @Parameter(name = "articleDTO", description = "文章信息")
@@ -180,6 +182,7 @@ public class ArticleController {
         return articleService.publish(articleDTO);
     }
 
+    @PreventDuplicateSubmit(expire = 10)
     @PreAuthorize("hasAnyAuthority('blog:publish:article')")
     @Operation(summary = "删除文章封面")
     @Parameter(name = "articleCover", description = "文章封面")
@@ -190,6 +193,7 @@ public class ArticleController {
         return articleService.deleteArticleCover(articleCoverUrl);
     }
 
+    @PreventDuplicateSubmit(expire = 10)
     @PreAuthorize("hasAnyAuthority('blog:publish:article')")
     @Operation(summary = "上传文章图片")
     @Parameters({

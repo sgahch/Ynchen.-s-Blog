@@ -1,0 +1,1 @@
+import{h as t}from"./index-f983387b.js";function i(e,r){return t({url:"/article/list",method:"get",params:{pageNum:e,pageSize:r}})}function n(){return t({url:"/article/recommend",method:"get"})}function c(){return t({url:"/article/random",method:"get"})}function l(e,r){return t({url:`/article/related/${e}/${r}`,method:"get"})}export{n as a,c as b,l as c,i as g};

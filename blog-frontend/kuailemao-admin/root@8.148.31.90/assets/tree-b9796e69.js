@@ -1,0 +1,1 @@
+function c(i){const r=i.filter(n=>n.parentId===null);return r.forEach(n=>{n.key=n.id;const e=t(n,i);e.length>0&&(n.children=e)}),r}function t(i,r){const n=r.filter(e=>e.parentId===i.id);return n.forEach(e=>{e.key=e.id;const l=t(e,r);l.length>0&&(e.children=l)}),n}export{c as b};

@@ -1,0 +1,1 @@
+window.__PRODUCTION__RUYU__BLOG__CONF__={"VITE_GLOB_APP_TITLE":"Ruyu-Blog"};Object.freeze(window.__PRODUCTION__RUYU__BLOG__CONF__);Object.defineProperty(window, "__PRODUCTION__RUYU__BLOG__CONF__", {configurable: false,writable: false,});
