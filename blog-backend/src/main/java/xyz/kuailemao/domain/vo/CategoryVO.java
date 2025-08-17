@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Data
 @Schema(name = "CategoryVO", description = "分类VO")
-public class CategoryVO {
+public class CategoryVO implements java.io.Serializable{
     //分类id
     @Schema(description = "分类id")
     private Long id;

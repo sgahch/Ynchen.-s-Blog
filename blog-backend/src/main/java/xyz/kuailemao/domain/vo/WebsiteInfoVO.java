@@ -10,7 +10,7 @@ import java.util.Date;
  * 创建时间：2023/12/27 17:16
  */
 @Data
-public class WebsiteInfoVO {
+public class WebsiteInfoVO implements java.io.Serializable{
     //站长头像
     private String webmasterAvatar;
     //站长名称

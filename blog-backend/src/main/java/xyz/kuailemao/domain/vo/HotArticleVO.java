@@ -8,7 +8,7 @@ import lombok.Data;
  * 热门推荐VO
  */
 @Data
-public class HotArticleVO {
+public class HotArticleVO implements java.io.Serializable{
     //文章id
     private Long id;
     //文章标题

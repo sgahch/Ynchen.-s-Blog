@@ -3,6 +3,7 @@ package xyz.kuailemao.domain.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
  */
 @Data
 @Schema(name = "CategoryArticleVO", description = "分类下的文章vo")
-public class CategoryArticleVO {
+public class CategoryArticleVO implements Serializable {
     //文章id
     @Schema(description = "文章id")
     private Long id;

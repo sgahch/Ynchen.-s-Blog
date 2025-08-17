@@ -2,13 +2,15 @@ package xyz.kuailemao.domain.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author kuailemao
  * <p>
  * 创建时间：2023/11/14 11:27
  */
 @Data
-public class LinkVO {
+public class LinkVO implements Serializable {
     //友链表id
     private Long id;
     //网站名称

@@ -3,6 +3,8 @@ package xyz.kuailemao.domain.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.io.Serializable;
+
 
 /**
  * @author kuailemao
@@ -10,7 +12,7 @@ import lombok.Data;
  * 创建时间：2023/10/30 15:09
  */
 @Data
-public class TreeHoleVO {
+public class TreeHoleVO implements Serializable {
     //用户昵称
     @Schema(description = "用户昵称")
     private String nickname;

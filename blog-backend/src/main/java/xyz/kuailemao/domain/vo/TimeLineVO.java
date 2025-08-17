@@ -3,6 +3,7 @@ package xyz.kuailemao.domain.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Date;
  * 时间轴DTO
  */
 @Data
-public class TimeLineVO {
+public class TimeLineVO implements Serializable {
     //文章id
     @Schema(description = "文章id")
     private Long id;

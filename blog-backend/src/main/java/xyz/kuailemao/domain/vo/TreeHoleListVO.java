@@ -10,7 +10,7 @@ import java.util.Date;
  * 创建时间：2024/1/19 21:13
  */
 @Data
-public class TreeHoleListVO {
+public class TreeHoleListVO implements java.io.Serializable{
     //树洞表id
     private Long id;
     //用户名称

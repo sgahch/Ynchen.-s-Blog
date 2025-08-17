@@ -3,6 +3,7 @@ package xyz.kuailemao.domain.vo;
 import lombok.Data;
 import xyz.kuailemao.domain.BaseData;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * 后台文章列表VO
  */
 @Data
-public class ArticleListVO implements BaseData {
+public class ArticleListVO implements BaseData , Serializable {
     //文章id
     private Long id;
     // 分类id

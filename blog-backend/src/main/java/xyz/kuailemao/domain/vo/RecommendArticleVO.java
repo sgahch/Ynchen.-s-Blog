@@ -3,6 +3,7 @@ package xyz.kuailemao.domain.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Date;
  */
 @Data
 @Schema(name = "RecommendArticleVO", description = "推荐文章VO")
-public class RecommendArticleVO {
+public class RecommendArticleVO implements Serializable {
     //文章id
     @Schema(description = "文章id")
     private Long id;

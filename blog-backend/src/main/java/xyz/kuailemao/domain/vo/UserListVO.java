@@ -10,7 +10,7 @@ import java.util.Date;
  * 创建时间：2023/12/15 8:43
  */
 @Data
-public class UserListVO {
+public class UserListVO implements java.io.Serializable{
     //用户id
     private Long id;
     //用户名

@@ -8,7 +8,7 @@ import lombok.Data;
  * 按照文章内容搜索文章
  */
 @Data
-public class SearchArticleByContentVO {
+public class SearchArticleByContentVO implements java.io.Serializable{
     //文章id
     private Long id;
     //文章标题

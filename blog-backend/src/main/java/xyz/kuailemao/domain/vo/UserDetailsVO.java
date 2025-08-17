@@ -1,6 +1,7 @@
 package xyz.kuailemao.domain.vo;
 
 import lombok.Data;
+import xyz.kuailemao.domain.BaseData;
 
 import java.util.Date;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  * 创建时间：2023/12/18 16:27
  */
 @Data
-public class UserDetailsVO {
+public class UserDetailsVO implements BaseData {
     //用户id
     private Long id;
     //用户昵称

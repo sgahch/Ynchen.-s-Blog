@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Accessors(chain = true)
-public class ArticleCommentVO {
+public class ArticleCommentVO implements Serializable {
     //评论id
     private Long id;
     //评论类型 (1文章 2友链 3说说)

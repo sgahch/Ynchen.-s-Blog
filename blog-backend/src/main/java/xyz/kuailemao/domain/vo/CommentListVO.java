@@ -2,6 +2,7 @@ package xyz.kuailemao.domain.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Date;
  * 创建时间：2024/1/22 8:18
  */
 @Data
-public class CommentListVO {
+public class CommentListVO implements Serializable {
     //评论id
     private Long id;
     //评论类型 (1文章 2留言板)

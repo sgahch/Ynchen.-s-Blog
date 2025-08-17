@@ -14,7 +14,7 @@ import java.util.Date;
 @Data
 @Builder
 @Schema(name = "ChatSessionDetailVO", description = "会话详情VO")
-public class ChatSessionDetailVO {
+public class ChatSessionDetailVO  {
     @Schema(description = "会话id")
     private Long id;
     @Schema(description = "会话内容")
