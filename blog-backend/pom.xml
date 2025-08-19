@@ -87,11 +87,6 @@
             <artifactId>java-jwt</artifactId>
             <version>4.3.0</version>
         </dependency>
-        <!-- redis -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
         <!-- 接口校验 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -169,6 +164,27 @@
             <artifactId>hutool-all</artifactId>
             <version>5.8.16</version>
         </dependency>
+
+
+        <!-- Spring Boot 缓存抽象 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
+        <!-- Redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!-- Caffeine 缓存 -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
+
     </dependencies>
 
 <!--    <profiles>-->
