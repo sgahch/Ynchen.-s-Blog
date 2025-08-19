@@ -1,5 +1,6 @@
 package xyz.kuailemao.config;
 
+import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
@@ -9,10 +10,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import xyz.kuailemao.cache.CompositeCacheManager; // 这是我们需要自己创建的类
+import xyz.kuailemao.cache.CompositeCacheManager;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -23,25 +23,30 @@ public class CompositeCacheConfig {
     /**
      * 配置一级缓存 Caffeine Cache Manager
      */
-    @Bean("caffeineCacheManager")
+    @Bean
     public CacheManager caffeineCacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setCaffeine(Caffeine.newBuilder()
-                .initialCapacity(128) // 初始大小
-                .maximumSize(1024)    // 最大数量
-                .expireAfterWrite(10, TimeUnit.MINUTES)); // 过期时间
+                .initialCapacity(128)
+                .maximumSize(1024)
+                .expireAfterWrite(10, TimeUnit.MINUTES));
         return cacheManager;
     }
 
     /**
      * 配置二级缓存 Redis Cache Manager
+     * 关键：将值序列化器从 Jackson 替换为 FastJSON
      */
-    @Bean("redisCacheManager")
+    @Bean
     public CacheManager redisCacheManager(RedisConnectionFactory connectionFactory) {
+        // 创建我们期望使用的 FastJSON 序列化器
+        FastJsonRedisSerializer<Object> fastJsonSerializer = new FastJsonRedisSerializer<>(Object.class);
+
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofHours(1)) // 默认1小时过期
+                .entryTtl(Duration.ofHours(1))
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
+                // !!! 核心修改：使用 FastJSON 序列化值 !!!
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(fastJsonSerializer))
                 .disableCachingNullValues();
 
         return RedisCacheManager.builder(connectionFactory)
@@ -51,10 +56,10 @@ public class CompositeCacheConfig {
 
     /**
      * 配置最终的复合缓存管理器
-     * @Primary 注解表示当有多个CacheManager时，默认使用这个
+     * @Primary 注解确保 @Cacheable 默认使用此管理器
      */
     @Primary
-    @Bean("compositeCacheManager")
+    @Bean
     public CacheManager cacheManager(CacheManager caffeineCacheManager, CacheManager redisCacheManager) {
         return new CompositeCacheManager(caffeineCacheManager, redisCacheManager);
     }

@@ -1,11 +1,13 @@
 package xyz.kuailemao.cache;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 
 import java.util.Collection;
 import java.util.Collections;
 
+@Slf4j
 public class CompositeCacheManager implements CacheManager {
 
     private final CacheManager caffeineCacheManager;
@@ -18,6 +20,8 @@ public class CompositeCacheManager implements CacheManager {
 
     @Override
     public Cache getCache(String name) {
+        log.info(">>>>>> CompositeCacheManager正在为缓存 '{}' 创建CompositeCache实例 <<<<<<", name);
+
         Cache caffeineCache = caffeineCacheManager.getCache(name);
         Cache redisCache = redisCacheManager.getCache(name);
         // 返回我们自定义的 CompositeCache 实例
