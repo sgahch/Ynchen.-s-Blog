@@ -1,31 +1,41 @@
 package xyz.kuailemao.config;
 
-import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfig {
 
     @Bean
-    @SuppressWarnings(value = { "unchecked", "rawtypes" })
-    public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory connectionFactory)
-    {
-        RedisTemplate<Object, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
+    @SuppressWarnings("all")
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
 
-        FastJsonRedisSerializer serializer = new FastJsonRedisSerializer(Object.class);
+        // 创建配置好的 Jackson 序列化器
+        Jackson2JsonRedisSerializer<Object> jacksonSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+        ObjectMapper om = new ObjectMapper();
+        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        // 关键配置：启用默认类型信息，这样可以序列化和反序列化任何POJO
+        om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
+        jacksonSerializer.setObjectMapper(om);
 
-        // 使用StringRedisSerializer来序列化和反序列化redis的key值
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(serializer);
+        // Key 使用 String 序列化
+        StringRedisSerializer stringSerializer = new StringRedisSerializer();
+        template.setKeySerializer(stringSerializer);
+        template.setHashKeySerializer(stringSerializer);
 
-        // Hash的key也采用StringRedisSerializer的序列化方式
-        template.setHashKeySerializer(new StringRedisSerializer());
-        template.setHashValueSerializer(serializer);
+        // Value 和 Hash-Value 使用我们配置好的 Jackson 序列化
+        template.setValueSerializer(jacksonSerializer);
+        template.setHashValueSerializer(jacksonSerializer);
 
         template.afterPropertiesSet();
         return template;
