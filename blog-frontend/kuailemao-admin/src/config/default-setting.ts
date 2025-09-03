@@ -3,7 +3,7 @@ import type { LayoutSetting } from '~@/stores/app'
 export default {
   'title': 'Ruyu-blog',
   'theme': 'light',
-  'logo': 'https://image.kuailemao.xyz/blog/logo/blog后台logo.svg',
+  'logo': 'http://www.w3.org/2000/svg',
   'collapsed': false,
   'drawerVisible': true,
   'colorPrimary': '#1677FF',

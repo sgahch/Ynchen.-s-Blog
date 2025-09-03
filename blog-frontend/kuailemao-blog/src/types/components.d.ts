@@ -7,7 +7,6 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    AudioControls: typeof import('./../components/Music/controls/components/audio-controls.vue')['default']
     Banner: typeof import('./../components/Banner/index.vue')['default']
     BottomRightLayout: typeof import('./../components/BottomRightLayout/index.vue')['default']
     BottomRightMore: typeof import('./../components/BottomRightMore/index.vue')['default']
@@ -18,8 +17,6 @@ declare module 'vue' {
     ChildComment: typeof import('./../components/Comment/ChildComment.vue')['default']
     Comment: typeof import('./../components/Comment/index.vue')['default']
     ContextMenu: typeof import('./../components/ContextMenu/index.vue')['default']
-    Controls: typeof import('./../components/Music/controls/index.vue')['default']
-    CustomMusicList: typeof import('./../components/Music/list/components/custom-music-list.vue')['default']
     DevToolsBlocker: typeof import('./../components/DevToolsBlocker/index.vue')['default']
     ElAffix: typeof import('element-plus/es')['ElAffix']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
@@ -50,7 +47,6 @@ declare module 'vue' {
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSegmented: typeof import('element-plus/es')['ElSegmented']
     ElSkeleton: typeof import('element-plus/es')['ElSkeleton']
-    ElSlider: typeof import('element-plus/es')['ElSlider']
     ElStep: typeof import('element-plus/es')['ElStep']
     ElSteps: typeof import('element-plus/es')['ElSteps']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
@@ -62,19 +58,14 @@ declare module 'vue' {
     Fullscreen: typeof import('./../components/Fullscreen/index.vue')['default']
     GoBottom: typeof import('./../components/GoBottom/index.vue')['default']
     Header: typeof import('./../components/Layout/Header/index.vue')['default']
-    Information: typeof import('./../components/Music/controls/components/information.vue')['default']
     Layout: typeof import('./../components/Layout/index.vue')['default']
-    List: typeof import('./../components/Music/list/index.vue')['default']
     Loading: typeof import('./../components/Loading/index.vue')['default']
-    LyricBoard: typeof import('./../components/Music/list/components/lyric-board.vue')['default']
     Main: typeof import('./../components/Layout/Main/index.vue')['default']
     Menu: typeof import('./../components/Layout/Header/Menu/index.vue')['default']
     MouseTrail: typeof import('./../components/MouseTrail/index.vue')['default']
     MoveMenu: typeof import('./../components/Layout/Header/MoveMenu/index.vue')['default']
-    Music: typeof import('./../components/Music/index.vue')['default']
     Pagination: typeof import('./../components/Pagination/index.vue')['default']
     Particles: typeof import('./../components/Particles/index.vue')['default']
-    ProgressLine: typeof import('./../components/Music/controls/components/progress-line.vue')['default']
     RandomArticle: typeof import('./../components/Card/RandomArticle/index.vue')['default']
     ReadingMode: typeof import('./../components/ReadingMode/index.vue')['default']
     ReplyBox: typeof import('./../components/Comment/ReplyBox.vue')['default']
@@ -82,17 +73,11 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     ScrollParallax: typeof import('./../components/ScrollParallax/index.vue')['default']
     Search: typeof import('./../components/Search/index.vue')['default']
-    SearchList: typeof import('./../components/Music/list/components/search-list.vue')['default']
     SideBar: typeof import('./../components/Layout/SideBar/index.vue')['default']
-    SpecialTitle: typeof import('./../components/Music/list/components/special-title.vue')['default']
     SvgIcon: typeof import('./../components/SvgIcon/index.vue')['default']
     TagListCard: typeof import('./../components/Card/TagListCard/index.vue')['default']
     TextGlitch: typeof import('./../components/TextGlitch/index.vue')['default']
-    TimeVolume: typeof import('./../components/Music/controls/components/time-volume.vue')['default']
     ToTop: typeof import('./../components/ToTop/index.vue')['default']
     Wave: typeof import('./../components/Wave/index.vue')['default']
-  }
-  export interface ComponentCustomProperties {
-    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

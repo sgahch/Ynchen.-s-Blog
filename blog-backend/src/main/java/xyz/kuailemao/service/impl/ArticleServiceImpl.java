@@ -12,6 +12,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -89,7 +90,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     // 确保已经导入了 @Cacheable, Collectors, Collections 等
 
     @Override
-    @Cacheable(cacheNames = "article", key = "'list:page:' + #pageNum + ':' + #pageSize")
+    @Cacheable(cacheNames = "articleList", key = "'page:' + #pageNum + ':' + #pageSize")
     public PageVO<List<ArticleVO>> listAllArticle(Integer pageNum, Integer pageSize) {
         log.info("=========== 从数据库查询前台文章列表: 页码 {}, 每页数量 {} ============", pageNum, pageSize);
 
@@ -185,7 +186,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      * @param id 文章id
      * @return 文章详情
      */
-    @Cacheable(cacheNames = "article", key = "'detail:' + #id")
+    @Cacheable(cacheNames = "articleDetail", key = "#id")
     @Override
     public ArticleDetailVO getArticleDetail(Integer id) {
         log.info("=========== 从数据库查询文章详情: {} ============", id);
@@ -298,33 +299,35 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Resource
     private ArticleTagService articleTagService;
 
+//================================================================================
+// 1. publish 方法 (新增/更新文章)
+//================================================================================
+
     @Transactional
+    @Caching(evict = {
+            // 效果: 新增或更新文章后，所有列表缓存都会被清空，下次访问时会重新从数据库加载
+            @CacheEvict(cacheNames = "articleList", allEntries = true),
+            // 效果: 只有在"更新"文章时 (articleDTO.id不为null)，才会精确地清除该文章的详情缓存
+            @CacheEvict(cacheNames = "articleDetail", key = "#articleDTO.id", condition = "#articleDTO.id != null")
+    })
     @Override
     public ResponseResult<Void> publish(ArticleDTO articleDTO) {
         Article article = articleDTO.asViewObject(Article.class, v -> v.setUserId(SecurityUtils.getUserId()));
 
-        // 判断是新增还是更新
-        boolean isUpdate = article.getId() != null;
-
         if (this.saveOrUpdate(article)) {
-
-            // 清除标签关系
-            articleTagMapper.deleteById(article.getId());
-            // 新增标签关系
-            List<ArticleTag> articleTags = articleDTO.getTagId().stream().map(articleTag -> ArticleTag.builder().articleId(article.getId()).tagId(articleTag).build()).toList();
-            articleTagService.saveBatch(articleTags);
-
-            // 如果是更新操作，则清除缓存
-            if (isUpdate) {
-                Cache articleCache = cacheManager.getCache("article");
-                if (articleCache != null) {
-                    String cacheKey = "detail:" + article.getId();
-                    log.info("=========== 更新文章，清除缓存: {} ============", cacheKey);
-//                    articleCache.evict(cacheKey);
-                    articleCache.clear();
-                }
+            // 清除旧的标签关系
+            if(article.getId() != null) {
+                articleTagMapper.delete(new LambdaQueryWrapper<ArticleTag>().eq(ArticleTag::getArticleId, article.getId()));
             }
-            log.info("=========== 发布文章成功: {} ============", article.getId());
+            // 新增标签关系
+            List<ArticleTag> articleTags = articleDTO.getTagId().stream()
+                    .map(tagId -> ArticleTag.builder().articleId(article.getId()).tagId(tagId).build())
+                    .toList();
+            if(!articleTags.isEmpty()) {
+                articleTagService.saveBatch(articleTags);
+            }
+
+            log.info("=========== 发布/更新文章成功: {} ============", article.getId());
             return ResponseResult.success();
         }
         return ResponseResult.failure();
@@ -486,8 +489,17 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }).toList();
     }
 
+//================================================================================
+// 2. updateStatus 方法 (更新文章状态)
+//================================================================================
+
     @Override
-    @CacheEvict(cacheNames = "article", allEntries = true)
+    @Caching(evict = {
+            // 效果: 文章状态变更（发布/下架）会影响列表，清空所有列表缓存
+            @CacheEvict(cacheNames = "articleList", allEntries = true),
+            // 效果: 同时精确清除该文章的详情缓存
+            @CacheEvict(cacheNames = "articleDetail", key = "#id")
+    })
     public ResponseResult<Void> updateStatus(Long id, Integer status) {
         if (this.update(new LambdaUpdateWrapper<Article>().eq(Article::getId, id).set(Article::getStatus, status))) {
             return ResponseResult.success();
@@ -495,14 +507,25 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         return ResponseResult.failure();
     }
 
+
+//================================================================================
+// 3. updateIsTop 方法 (更新文章置顶状态)
+//================================================================================
+
     @Override
-    @CacheEvict(cacheNames = "article", allEntries = true)
+    @Caching(evict = {
+            // 效果: 文章置顶状态变更会影响列表，清空所有列表缓存
+            @CacheEvict(cacheNames = "articleList", allEntries = true),
+            // 效果: 同时精确清除该文章的详情缓存
+            @CacheEvict(cacheNames = "articleDetail", key = "#id")
+    })
     public ResponseResult<Void> updateIsTop(Long id, Integer isTop) {
         if (this.update(new LambdaUpdateWrapper<Article>().eq(Article::getId, id).set(Article::getIsTop, isTop))) {
             return ResponseResult.success();
         }
         return ResponseResult.failure();
     }
+
 
     @Override
     public ArticleDTO getArticleDTO(Long id) {
@@ -517,7 +540,15 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
 
+//================================================================================
+// 4. deleteArticle 方法 (删除文章)
+//================================================================================
+
     @Transactional
+    @Caching(evict = {
+            // 效果: 删除文章会影响所有列表，清空所有列表缓存
+            @CacheEvict(cacheNames = "articleList", allEntries = true)
+    })
     @Override
     public ResponseResult<Void> deleteArticle(List<Long> ids) {
         if (this.removeByIds(ids)) {
@@ -528,26 +559,21 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             favoriteMapper.delete(new LambdaQueryWrapper<Favorite>().eq(Favorite::getType, FavoriteEnum.FAVORITE_TYPE_ARTICLE.getType()).and(a -> a.in(Favorite::getTypeId, ids)));
             commentMapper.delete(new LambdaQueryWrapper<Comment>().eq(Comment::getType, CommentEnum.COMMENT_TYPE_ARTICLE.getType()).and(a -> a.in(Comment::getTypeId, ids)));
 
-            // --- 手动清除缓存开始 ---
-            if (ids != null && !ids.isEmpty()) {
-                // 1. 获取名为 "article" 的缓存区
-                Cache articleCache = cacheManager.getCache("article");
-                if (articleCache != null) {
-                    // 2. 遍历ID列表，逐个清除缓存
-                    ids.forEach(id -> {
-                        String cacheKey = "detail:" + id;
-                        log.info("=========== 清除文章详情缓存: {} ============", cacheKey);
-                        articleCache.evict(cacheKey);
-                    });
-                }
+            // --- 手动清除文章详情缓存 ---
+            // 理由: @CacheEvict注解不方便处理List<Long>类型的key, 因此手动清除更直观
+            Cache detailCache = cacheManager.getCache("articleDetail");
+            if (detailCache != null && ids != null && !ids.isEmpty()) {
+                ids.forEach(id -> {
+                    log.info("=========== 删除文章，清除详情缓存: {} ============", id);
+                    detailCache.evict(id);
+                });
             }
-            // --- 手动清除缓存结束 ---
+            // --------------------------
 
             return ResponseResult.success();
         }
         return ResponseResult.failure();
     }
-
     @Override
     public List<InitSearchTitleVO> initSearchByTitle() {
         List<Article> articles = this.list(new LambdaQueryWrapper<Article>().eq(Article::getStatus, SQLConst.PUBLIC_ARTICLE));

@@ -82,15 +82,6 @@ export const constantRouter = [
                     title: '博客友链',
                 }
             },
-            // 音乐
-            {
-                path: '/music',
-                component: () => import('@/views/Music/index.vue'),
-                name: 'music',
-                meta: {
-                    title: '音乐',
-                }
-            },
             // 关于
             {
                 path: '/about',
