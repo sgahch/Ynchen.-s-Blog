@@ -1,0 +1,105 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 标题 -->
+  <text x="400" y="30" font-family="Arial" font-size="24" text-anchor="middle" fill="#333">Ruyu-Blog 后端架构图</text>
+  
+  <!-- 背景网格 -->
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#eee" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="600" fill="url(#grid)"/>
+  
+  <!-- 客户端层 -->
+  <rect x="200" y="60" width="400" height="40" rx="5" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/>
+  <text x="400" y="85" font-family="Arial" font-size="16" text-anchor="middle" fill="#333">客户端层 (浏览器/APP)</text>
+  
+  <!-- 连接线 -->
+  <line x1="400" y1="100" x2="400" y2="120" stroke="#666" stroke-width="2"/>
+  
+  <!-- API网关层 -->
+  <rect x="300" y="120" width="200" height="40" rx="5" fill="#e8f5e9" stroke="#388e3c" stroke-width="2"/>
+  <text x="400" y="145" font-family="Arial" font-size="16" text-anchor="middle" fill="#333">API网关 (Spring Security)</text>
+  
+  <!-- 连接线 -->
+  <line x1="300" y1="160" x2="200" y2="190" stroke="#666" stroke-width="2"/>
+  <line x1="400" y1="160" x2="400" y2="190" stroke="#666" stroke-width="2"/>
+  <line x1="500" y1="160" x2="600" y2="190" stroke="#666" stroke-width="2"/>
+  
+  <!-- 控制器层 -->
+  <rect x="150" y="190" width="100" height="60" rx="5" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="200" y="225" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">文章控制器</text>
+  
+  <rect x="350" y="190" width="100" height="60" rx="5" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="400" y="225" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">用户控制器</text>
+  
+  <rect x="550" y="190" width="100" height="60" rx="5" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="600" y="225" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">评论控制器</text>
+  
+  <!-- 连接线 -->
+  <line x1="200" y1="250" x2="200" y2="280" stroke="#666" stroke-width="2"/>
+  <line x1="400" y1="250" x2="400" y2="280" stroke="#666" stroke-width="2"/>
+  <line x1="600" y1="250" x2="600" y2="280" stroke="#666" stroke-width="2"/>
+  
+  <!-- 服务层 -->
+  <rect x="150" y="280" width="100" height="60" rx="5" fill="#fff3e0" stroke="#f57c00" stroke-width="2"/>
+  <text x="200" y="315" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">文章服务</text>
+  
+  <rect x="350" y="280" width="100" height="60" rx="5" fill="#fff3e0" stroke="#f57c00" stroke-width="2"/>
+  <text x="400" y="315" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">用户服务</text>
+  
+  <rect x="550" y="280" width="100" height="60" rx="5" fill="#fff3e0" stroke="#f57c00" stroke-width="2"/>
+  <text x="600" y="315" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">评论服务</text>
+  
+  <!-- 连接线 -->
+  <line x1="200" y1="340" x2="200" y2="370" stroke="#666" stroke-width="2"/>
+  <line x1="400" y1="340" x2="400" y2="370" stroke="#666" stroke-width="2"/>
+  <line x1="600" y1="340" x2="600" y2="370" stroke="#666" stroke-width="2"/>
+  
+  <!-- 数据访问层 -->
+  <rect x="150" y="370" width="100" height="60" rx="5" fill="#e0f7fa" stroke="#006064" stroke-width="2"/>
+  <text x="200" y="405" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">文章Mapper</text>
+  
+  <rect x="350" y="370" width="100" height="60" rx="5" fill="#e0f7fa" stroke="#006064" stroke-width="2"/>
+  <text x="400" y="405" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">用户Mapper</text>
+  
+  <rect x="550" y="370" width="100" height="60" rx="5" fill="#e0f7fa" stroke="#006064" stroke-width="2"/>
+  <text x="600" y="405" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">评论Mapper</text>
+  
+  <!-- 连接线 -->
+  <line x1="200" y1="430" x2="150" y2="480" stroke="#666" stroke-width="2"/>
+  <line x1="400" y1="430" x2="400" y2="480" stroke="#666" stroke-width="2"/>
+  <line x1="600" y1="430" x2="650" y2="480" stroke="#666" stroke-width="2"/>
+  <line x1="200" y1="430" x2="250" y2="530" stroke="#666" stroke-width="2"/>
+  <line x1="400" y1="430" x2="400" y2="530" stroke="#666" stroke-width="2"/>
+  <line x1="600" y1="430" x2="550" y2="530" stroke="#666" stroke-width="2"/>
+  
+  <!-- 数据存储层 -->
+  <rect x="100" y="480" width="100" height="40" rx="5" fill="#f1f8e9" stroke="#558b2f" stroke-width="2"/>
+  <text x="150" y="505" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">MySQL数据库</text>
+  
+  <rect x="350" y="480" width="100" height="40" rx="5" fill="#f1f8e9" stroke="#558b2f" stroke-width="2"/>
+  <text x="400" y="505" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">Redis缓存</text>
+  
+  <rect x="600" y="480" width="100" height="40" rx="5" fill="#f1f8e9" stroke="#558b2f" stroke-width="2"/>
+  <text x="650" y="505" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">MinIO存储</text>
+  
+  <rect x="200" y="530" width="400" height="40" rx="5" fill="#f1f8e9" stroke="#558b2f" stroke-width="2"/>
+  <text x="400" y="555" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">RabbitMQ消息队列</text>
+  
+  <!-- 装饰元素 -->
+  <circle cx="400" cy="300" r="150" fill="none" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <!-- 图例 -->
+  <rect x="650" y="40" width="10" height="10" rx="2" fill="#e3f2fd" stroke="#1976d2" stroke-width="1"/>
+  <text x="665" y="48" font-family="Arial" font-size="10" text-anchor="start" fill="#333">表示层</text>
+  
+  <rect x="650" y="60" width="10" height="10" rx="2" fill="#fff3e0" stroke="#f57c00" stroke-width="1"/>
+  <text x="665" y="68" font-family="Arial" font-size="10" text-anchor="start" fill="#333">业务逻辑层</text>
+  
+  <rect x="650" y="80" width="10" height="10" rx="2" fill="#e0f7fa" stroke="#006064" stroke-width="1"/>
+  <text x="665" y="88" font-family="Arial" font-size="10" text-anchor="start" fill="#333">数据访问层</text>
+  
+  <rect x="650" y="100" width="10" height="10" rx="2" fill="#f1f8e9" stroke="#558b2f" stroke-width="1"/>
+  <text x="665" y="108" font-family="Arial" font-size="10" text-anchor="start" fill="#333">数据存储层</text>
+</svg>

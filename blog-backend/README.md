@@ -1,175 +1,259 @@
-## 博客介绍
+# Ruyu-Blog 后端项目
 
-<p align="center">
-  <a href="https://www.kuailemao.xyz">
-    <img src="https://foruda.gitee.com/avatar/1667975309022664009/11937114_kuailemao_1667975308.png" alt="Ruyu的个人博客" style="border-radius: 50%;">
-  </a>
-</p>
+## 📋 项目介绍
 
-<p align="center">
-  基于 SpringBoot3 + Vue3 开发前后端分离个人博客系统
-</p>
+Ruyu-Blog 后端是一个基于 Spring Boot 3.x 构建的现代化博客系统后端服务，提供完整的 RESTful API，支持用户管理、内容发布、评论互动、权限控制等核心功能。系统采用单体架构设计，集成了 Redis、RabbitMQ、MinIO 等中间件，实现高性能、可扩展的博客服务。
 
-## 项目部分截图
+## 🛠️ 技术栈
 
-### 前台
+- **核心框架**：Spring Boot 3.1.4
+- **安全框架**：Spring Security 6.x + JWT
+- **ORM 框架**：MyBatis-Plus 3.5.3
+- **数据库**：MySQL 8.0+
+- **缓存**：Redis 6.0+
+- **消息队列**：RabbitMQ 3.8+
+- **对象存储**：MinIO
+- **开发工具**：
+  - Lombok - 简化 Java 代码
+  - Hutool - Java 工具类库
+  - FastJSON - JSON 处理
+  - Knife4j - API 文档
+- **容器化**：Docker
 
-![前台首页](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E9%A6%96%E9%A1%B5.jpg)
+## 📁 项目结构
 
-![前台中心](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E4%B8%AD%E5%BF%83.jpg)
+```
+blog-backend/src/main/java/xyz/kuailemao/
+├── BlogBackendApplication.java  # 应用启动类
+├── annotation/                  # 自定义注解
+│   ├── AccessLimit.java         # 访问限制注解
+│   ├── Log.java                 # 日志记录注解
+│   └── ...
+├── aop/                         # 切面编程实现
+│   ├── LogAspect.java           # 日志处理切面
+│   ├── AccessLimitAspect.java   # 访问限制切面
+│   └── ...
+├── cache/                       # 缓存相关配置和实现
+├── config/                      # 系统配置类
+│   ├── SecurityConfig.java      # 安全配置
+│   ├── RedisConfig.java         # Redis 配置
+│   ├── RabbitMQConfig.java      # 消息队列配置
+│   └── ...
+├── constants/                   # 常量定义
+├── controller/                  # 控制器层（处理HTTP请求）
+│   ├── ArticleController.java   # 文章相关接口
+│   ├── UserController.java      # 用户相关接口
+│   └── ...
+├── domain/                      # 数据模型层
+│   ├── dto/                     # 数据传输对象
+│   ├── entity/                  # 实体类
+│   └── vo/                      # 视图对象
+├── enums/                       # 枚举类
+├── exceptions/                  # 异常处理
+│   ├── GlobalExceptionHandler.java  # 全局异常处理器
+│   └── ...
+├── filter/                      # 过滤器
+├── handler/                     # 处理器
+├── interceptor/                 # 拦截器
+├── listener/                    # 监听器
+├── mapper/                      # 数据访问层
+├── quartz/                      # 定时任务
+├── service/                     # 业务逻辑层
+│   ├── impl/                    # 业务实现类
+│   ├── ArticleService.java      # 文章服务接口
+│   ├── UserService.java         # 用户服务接口
+│   └── ...
+├── task/                        # 任务相关
+├── tasks/                       # 定时任务
+└── utils/                       # 工具类
+```
 
-![前台文章](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%89%8D%E5%8F%B0%E6%96%87%E7%AB%A0.jpg)
+## 🏗️ 系统架构详解
 
-### 后台
+### 整体架构
 
-![后台发布文章](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%90%8E%E5%8F%B0%E5%8F%91%E5%B8%83%E6%96%87%E7%AB%A0.jpg)
+Ruyu-Blog 后端采用经典的三层架构设计，结合现代微服务思想，构建高性能、可扩展的博客系统后端服务。
 
-![后台文章列表](https://gitee.com/kuailemao/ruyu-blog/raw/master/img/%E5%90%8E%E5%8F%B0%E6%96%87%E7%AB%A0%E5%88%97%E8%A1%A8.jpg)
+![后端架构图](https://raw.githubusercontent.com/kuailemao/Ruyu-Blog/master/img/backend_architecture.svg)
 
-## 在线体验地址
-**注意：在线预览地址可能与仓库代码不同步，以仓库为主**
-> 服务器比较垃圾，随机可能崩掉，发现了会进行维护，且看且珍惜
+### 分层设计
 
-**前台博客：** https://kuailemao.xyz
+1. **表示层（Controller）**
+   - 处理 HTTP 请求，接收前端参数
+   - 调用业务层服务，返回处理结果
+   - 实现 RESTful API 接口设计
 
-**后台管理：** https://blog.kuailemao.xyz
+2. **业务逻辑层（Service）**
+   - 封装核心业务逻辑
+   - 处理数据校验和业务规则
+   - 调用数据访问层进行数据操作
 
-**测试账号：** Test，**密码：** 123456
+3. **数据访问层（Mapper）**
+   - 基于 MyBatis-Plus 实现数据库操作
+   - 处理数据持久化和查询
 
-**ps:** 测试账号功能不代表系统所有功能，有些权限过高模块不方便在线展示
+4. **基础设施层**
+   - 缓存系统（Redis）：提高数据访问性能
+   - 消息队列（RabbitMQ）：处理异步任务和解耦系统
+   - 对象存储（MinIO）：管理图片等静态资源
+   - 安全框架（Spring Security）：处理认证和授权
 
-**Gitee地址：** https://gitee.com/kuailemao/ruyu-blog
+## ✨ 核心功能模块
 
-**Github地址：** https://github.com/kuailemao/Ruyu-Blog
+### 🔐 用户与权限管理
+- JWT + Spring Security 实现认证授权
+- RBAC 权限模型，支持细粒度权限控制
+- 支持邮箱注册、第三方登录（Gitee/GitHub）
+- 黑名单系统、IP 访问限制
 
-**B站视频介绍：** https://www.bilibili.com/video/BV181hNeiEDb/?vd_source=ff1e09f5473622b91dc0efc92418b537#reply112716668797561
+### 📝 内容管理
+- 文章管理：发布、编辑、删除、分类、标签
+- 评论系统：多级评论、回复通知、评论审核
+- 分类管理：多级分类结构
+- 标签系统：文章标签、热门标签
+- 友链管理：友链申请、审核、展示
+- 树洞功能：匿名留言、情感分享
+- 留言板：访客留言、管理员回复
 
-**接口文档：** [API文档 (kuailemao.xyz)](http://kuailemao.xyz:8088/doc.html#/home)
+### 🚀 性能优化
+- 多级缓存策略：Redis 缓存 + 本地缓存
+- 接口访问限流：基于令牌桶算法
+- 异步消息处理：邮件通知、日志记录等异步任务
+- 图片存储：MinIO 对象存储，支持图片上传和 CDN 加速
 
-**欢迎各位提交 PR ，一起改进项目**
+### 📊 系统监控
+- AOP 统一日志记录
+- 操作审计追踪
+- 访问统计分析
+- 系统资源监控
 
-## 运行环境
+## 🚀 快速开始
 
-### 后端：
+### 环境要求
+- JDK 17+
+- MySQL 8.0+
+- Redis 6.0+
+- RabbitMQ 3.8+
+- MinIO
+- Maven 3.6+
 
-|   名称   | 环境  |
-| :------: | :---: |
-|  MySQL   |  8.0  |
-|  Redis   | 7.2.3 |
-| RabbitMQ | 最新  |
-|  minio   | 最新  |
-|   JDK    |  17   |
+### 1. 初始化数据库
 
-**前端：**
+执行 `../sql/Ruyu-Blog.sql` 脚本初始化数据库。
 
-| 名称 |  环境   |
-| :--: | :-----: |
-| pnpm | 8.12.0  |
-| node | 16.17.0 |
+### 2. 配置环境变量
 
-## 项目部署
-**部署文档地址：** https://kuailemao.xyz/article/48
+在 `blog-backend/src/main/resources/application.yml` 中配置以下信息：
 
-## 项目特点
+```yaml
+# 数据库配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: password
 
-* 前端参考了众多优秀博客大佬设计，页面美观，响应式布局
-* 后台管理基于 Antdv Pro 后台通用框架二次开发
-* 前后端分离，Docker Compose 一键部署
-* 采用 RABC 权限模型，使用 SpringSecurity 进行权限管理
-* 支持动态权限修改、动态菜单和路由
-* 文章、分类、标签、时间轴、树洞、留言板、聊天、友链等模块
-* 站长介绍、公告、电子时钟、随机文章、每日鸡汤、网站资讯
-* 支持代码高亮、图片预览、黑夜模式、点赞、收藏、评论等功能
-* 评论支持在线预览、Markdown、表情包
-* 发送友链申请、通过等自动发送邮件提醒
-* 接入第三方 gitee、github登录，减少注册成本
-* 文章编辑使用 Markdown 编辑器
-* 实现日志管理（操作、登录），服务监控、用户、菜单、角色、权限管理
-* 使用 自己搭建 minio 进行图片存储（避免了使用第三方对象存储被刷流量问题）
-* 使用 拦截器 + Redis 对接口进行了限流处理（每分钟）,后端使用 JSR 303 对参数校验，使用 Spring Aop + RabbitMQ 对后台操作日志处理
-* 采用 Restful 风格的 API，注释完善，后端代码使用了大量 stream 流编程方式，代码非常美观
-* ……
+# Redis 配置
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 
+      database: 0
 
-## 技术介绍
+# RabbitMQ 配置
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 
-**前台前端（博客）：** Vue3 + Pinia +  Vue Router + TypeScript + Axios + Element Plus + Echarts……
+# MinIO 配置
+minio:
+  endpoint: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket-name: blog
 
-**后台启动（管理）：** Vue3 + Pinia +  Vue Router + TypeScript + Axios + Antdv Pro + Ant Design Vue……
+# JWT 配置
+jwt:
+  secret: your-secret-key
+  expiration: 3600000
+```
 
-**后端：** JDK17 + SpringBoot3 + SpringSecurity + Mysql + Redis + Quartz  + RabbitMQ + Minio + Mybatis-Plus + Nginx + Docker……
+### 3. 启动后端服务
 
-**其他：** Gitee、Github 第三方登录
+```bash
+# 开发环境启动
+mvn spring-boot:run
 
-## 运行环境
+# 构建打包
+mvn clean package
 
-### 推荐
+# 运行 jar 包
+java -jar target/blog-backend.jar
+```
 
-> 最低 2 核 4 G
+服务启动后，可访问 `http://localhost:8088/doc.html` 查看 API 文档。
 
-**我的：** 腾讯云 2 核 2 G  4 M * 2  （穷）
+## 🐳 Docker 部署
 
-**系统：** **OpenCloudOS**
+### 构建 Docker 镜像
 
-**前端：** Docker   **后端：** jenkins
+```bash
+cd blog-backend
 
-## 后续计划（有空）
+docker build -t ruyu-blog-backend .
+```
 
-> 白天上班，只能抽空优化项目，还望理解
+### 运行 Docker 容器
 
-- [x] 持续优化前台响应式
-- [x] 新增用户设置、支持修改邮箱、头像、昵称...
-- [x] 重构移动端首页
-- [x] 重构移动端文章页面
-- [x] 重构各种功能邮箱提醒(v1.4.1)
-- [ ] 实现后台导入导出
-- [x] 实现前台搜索
-- [x] 内置图片上传压缩
-- [x] 相册管理(v1.6.0)
-- [x] 前台添加更加有趣的效果
-- [x] 前台音乐播放器
-- [ ] 后台图片资源管理模块
-- [x] 找出并修复一些隐藏的bug(持续完善)
-- [x] 前端响应速度优化到网络正常的情况下5秒以内
-- [x] 实现黑名单管理机制
-- [ ] 后台首页数据大屏
-- [ ] 后台图片资源管理
-- [ ] 博客app版本
-- [ ] 博客小程序版本
+```bash
+docker run -d -p 8088:8088 --name ruyu-blog-backend \
+  -e SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/blog \
+  -e SPRING_DATASOURCE_USERNAME=root \
+  -e SPRING_DATASOURCE_PASSWORD=password \
+  -e SPRING_REDIS_HOST=redis \
+  -e SPRING_RABBITMQ_HOST=rabbitmq \
+  --link mysql:mysql \
+  --link redis:redis \
+  --link rabbitmq:rabbitmq \
+  ruyu-blog-backend
+```
 
-## 项目总结
+### 使用 Docker Compose
 
-整个项目花费了大量的时间与精力（尤其是前台前端），作者独自手写了三个月左右，除了后台的页面使用了一个后台框架模板外，其他的全部一点一点手写（包括后台的全部模块），这也是我第一次正式的开源一个项目（莫名成就感），虽然但是这个项目我并不觉得很完美，一部分是因为我自己技术有限的原因（主后端的全栈选手），一部分是项目还没经过时间的拷打，开发过程中也参考了很多优秀的项目，在这里感谢大家的开源项目，希望我的项目也能给你带来收获。
+推荐使用 Docker Compose 进行整体部署，详见项目根目录的 `docker-compose.yml` 文件。
 
-### 鸣谢项目：
+## 🔧 开发指南
 
-* [mrzym-blog](https://gitee.com/mrzym/stable-version-of-blog)
+### 代码规范
+- 遵循 Spring Boot 最佳实践
+- 方法和类添加完整的 JavaDoc 注释
+- 使用 Lombok 简化代码
+- 业务逻辑尽可能封装在 Service 层
 
-* [掐指yi算’逢考必过-Blog](https://gitee.com/wu_shengdong/blog)
+### API 设计规范
+- 遵循 RESTful 风格
+- 使用统一的响应格式
+- 添加适当的参数校验
+- 实现接口限流和防刷
 
-* [hexo-theme-butterfly](https://github.com/jerryc127/hexo-theme-butterfly)
+### 日志管理
+- 使用 @Log 注解记录关键操作日志
+- 异常日志统一处理
+- 重要业务流程添加详细日志
 
-* [Antdv Pro](https://docs.antdv-pro.com/)
+## 🤝 贡献指南
 
-* [md-editor-v3](https://imzbf.github.io/md-editor-v3/zh-CN/index)
+1. Fork 本项目
+2. 创建新的分支（git checkout -b feature/your-feature）
+3. 提交你的修改（git commit -am 'Add some feature'）
+4. 推送到分支（git push origin feature/your-feature）
+5. 创建 Pull Request
 
-* [vue-danmaku](https://github.com/hellodigua/vue-danmaku)
+## 📝 许可证
 
-* ……
-
-#### Heo表情包开源地址
-* https://github.com/zhheo/Sticker-Heo
-
-## 最后
-
-**该文档初次编写可能存在一些问题，如果发现，后面会进行修改提交**
-
-### <u>如果对你有益，麻烦点个star支持项目，能让项目得到更多关注，谢谢！！！</u>
-
-**该项目交流群：** （有什么不懂的可以提问）
-
-**QQ：** 635887836
-
-**二维码：**
-
-<img src="https://gitee.com/kuailemao/ruyu-blog/raw/master/img/Ruyu开源博客交流群群聊二维码.png" />
+本项目采用 Apache License 2.0 许可证。详情请查看 [LICENSE](LICENSE) 文件。
 

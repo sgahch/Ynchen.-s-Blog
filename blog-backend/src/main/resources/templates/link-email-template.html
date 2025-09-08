@@ -1,274 +1,65 @@
-<!--<!DOCTYPE html>-->
-<!--<html xmlns:th="http://www.thymeleaf.org" lang="en">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <title>欢迎邮件</title>-->
-<!--</head>-->
-<!--<style>-->
-
-<!--    * {-->
-<!--        margin: 0;-->
-<!--        padding: 0;-->
-<!--    }-->
-
-<!--    .div_container {-->
-<!--        text-align: center;-->
-<!--        font-size: 20px;-->
-<!--        color: #333333;-->
-<!--        border-radius: 1rem;-->
-<!--        height: 100vh;-->
-<!--        padding: 0 2rem;-->
-<!--        background: linear-gradient(135deg, #f02fc2, #6094ea);-->
-<!--    }-->
-
-<!--    .butt_to {-->
-<!--        width: 200px;-->
-<!--        height: 50px;-->
-<!--        line-height: 50px;-->
-<!--        text-align: center;-->
-<!--        font-size: 20px;-->
-<!--        font-weight: bold;-->
-<!--        color: #333333;-->
-<!--        background: white;-->
-<!--        border-radius: 1rem;-->
-<!--        margin: 0 auto;-->
-<!--    }-->
-
-<!--    .butt_to:hover {-->
-<!--        cursor: pointer;-->
-<!--        background: linear-gradient(135deg, #f02fc2, #6094ea);-->
-<!--        color: white;-->
-<!--        transition: 0.5s;-->
-<!--        box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);-->
-<!--    }-->
-
-<!--    .but-container {-->
-<!--        display: flex;-->
-<!--        justify-content: space-around;-->
-<!--        align-items: center;-->
-<!--        margin-top: 2rem;-->
-<!--    }-->
-
-<!--    @media screen and (max-width: 740px) {-->
-<!--        .div_container {-->
-<!--            font-size: 16px;-->
-<!--        }-->
-
-<!--        .but-container {-->
-<!--            margin-top: 1rem;-->
-<!--        }-->
-
-<!--        .butt_to {-->
-<!--            width: 150px;-->
-<!--            height: 40px;-->
-<!--            line-height: 40px;-->
-<!--            font-size: 16px;-->
-<!--        }-->
-<!--    }-->
-
-<!--    @media screen and (max-width: 550px) {-->
-
-<!--        .title_container {-->
-<!--            flex-direction: column;-->
-<!--        }-->
-
-<!--        .title_container div:nth-of-type(2) {-->
-<!--            margin-top: .5rem;-->
-<!--        }-->
-<!--    }-->
-
-<!--    .avatar_container {-->
-<!--        width: 150px;-->
-<!--        height: 150px;-->
-<!--        margin: 0 auto;-->
-<!--        padding-top: 2rem;-->
-
-<!--        img {-->
-<!--            width: 100%;-->
-<!--            height: 100%;-->
-<!--            border-radius: 40%;-->
-<!--            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);-->
-<!--        }-->
-<!--    }-->
-
-<!--    .title_container {-->
-<!--        margin-top: 20px;-->
-<!--        display: flex;-->
-<!--        justify-content: center;-->
-<!--        align-items: center;-->
-<!--    }-->
-<!--</style>-->
-<!--<body>-->
-<!--<div>-->
-<!--    <div class="div_container">-->
-<!--        <div class="avatar_container">-->
-<!--            <img src="https://image.kuailemao.xyz/blog/websiteInfo/avatar/52e4b3e9-b1e0-4e9b-ab6e-4effc237ab1a.jpg"-->
-<!--                 alt="头像">-->
-<!--        </div>-->
-<!--        <div class="title_container">-->
-<!--            <div>-->
-<!--                欢迎注册 <span style="color: #0653e8;font-weight: bold;font-size: 25px">Ruyu-Blog</span>-->
-<!--            </div>-->
-<!--            <div>-->
-<!--                &nbsp;&nbsp; 一个全开源免费的个人博客网站-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        <p style="margin: 1rem 0">-->
-<!--            您的邮件验证码为：<span th:text="${code}" style="color: #f06595;font-weight: bold"></span>-->
-<!--        </p>-->
-<!--        <p>有效时间为 <span th:text="${expirationTime}"></span>，为了保障您的安全，请勿向他人泄露验证码信息。如非本人操作，请忽略此邮件-->
-<!--        </p>-->
-<!--        <p style="text-align: center"></p>-->
-<!--        <div class="but-container">-->
-<!--            <a th:href="${toUrl}">-->
-<!--                <div class="butt_to">-->
-<!--                    立即前往-->
-<!--                </div>-->
-<!--            </a>-->
-<!--            <a th:href="${openSourceAddress}">-->
-<!--                <div class="butt_to">-->
-<!--                    给个Star-->
-<!--                </div>-->
-<!--            </a>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-<!--</body>-->
-<!--</html>-->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>欢迎邮件</title>
-    <style type="text/css">
-        /* 媒体查询 */
-        @media screen and (max-width: 740px) {
-            .div_container {
-                font-size: 16px !important;
-            }
-
-            .but-container {
-                margin-top: 1rem !important;
-            }
-
-            .butt_to {
-                width: 150px !important;
-                height: 40px !important;
-                line-height: 40px !important;
-                font-size: 16px !important;
-            }
-        }
-
-        @media screen and (max-width: 550px) {
-            .title_container {
-                flex-direction: column !important;
-            }
-
-            .title_container div:nth-of-type(2) {
-                margin-top: .5rem !important;
-            }
-        }
-
-        .butt_to:hover {
-            cursor: pointer;
-            background: linear-gradient(135deg, #f02fc2, #6094ea);
-            color: white;
-            transition: 0.5s;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-        }
-    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="'新友链申请 - ' + ${websiteName}">新友链申请</title>
 </head>
-<body>
-<div>
-    <div class="div_container"
-         style="display: flex;
-         justify-content: center;
-         align-items: center;
-         flex-direction: column;
-         font-size: 20px;
-         color: #333333;
-         border-radius: 1rem;
-         min-height: 100vh;
-         padding: 0 2rem;
-         background: linear-gradient(135deg, #f02fc2, #6094ea);
-">
-        <div style="height: 100%;padding: 0 2rem;">
-            <div class="avatar_container" style="width: 150px; height: 150px; margin: 0 auto; padding-top: 2rem;">
-                <img src="https://image.kuailemao.xyz/blog/websiteInfo/avatar/52e4b3e9-b1e0-4e9b-ab6e-4effc237ab1a.jpg"
-                     alt="头像"
-                     style="width: 100%; height: 100%; border-radius: 40%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);">
-            </div>
-            <div class="title_container"
-                 style="margin-top: 20px; display: flex; justify-content: center; align-items: center;">
-                <div>
-                    <span style="color: #ffffff;font-weight: bold;font-size: 25px">站长大人，有新的友链申请</span>
-                </div>
-            </div>
-            <div style="display: flex;justify-content: start;align-items: start;width: 100%;margin-top: 3rem">
-                <div style="font-weight: bold;color: black;font-size: 18px;margin-left: 1rem">申请信息如下：</div>
-            </div>
-            <div style="margin: 1rem 0; display: flex; flex-direction: column; align-items: start;border: 2px solid #cccccc; padding: 1rem;border-radius: 1rem">
-                <div>
-                    <span style="font-weight: bold">网站名称：</span>
-                    <span th:text="${name}"></span>
-                </div>
-                <div style="margin-top: .5rem"><span style="font-weight: bold">网站地址：</span>
-                    <span>
-                        <a th:href="${url}" th:text="${url}" style="text-decoration: none"></a>
-                    </span>
-                </div>
-                <div style="margin-top: .5rem">
-                    <span style="font-weight: bold">网站描述：</span>
-                    <span th:text="${description}">一个测试友链申请邮箱的网站！！</span>
-                </div>
-                <div style="margin-top: .5rem;display: flex;justify-content: center;align-items: center">
-                    <div>
-                        <span style="font-weight: bold">背景图片：</span>
-                    </div>
-                    <div>
-                        <img style="border-radius: 1rem" width="200px"
-                             th:src="${background}"
-                             alt="网站地址">
-                    </div>
-                </div>
-                <div style="margin-top: .5rem">
-                    <span style="font-weight: bold">邮箱地址：</span>
-                    <span th:text="${linkEmail}"></span>
-                </div>
-            </div>
-            <p style="font-size: 15px;color: #630000">邮箱审核按钮 <span style="font-weight: bold">7</span> 天有效，失效后只能前往后台审核 </p>
-            <div class="but-container"
-                 style="display: flex; justify-content: space-around; align-items: center; margin: 2rem 0;">
-                <a th:href="${toUrl}">
-                    <div class="butt_to"
-                         style="width: 200px; height: 50px; line-height: 50px; text-align: center; font-size: 20px; font-weight: bold; color: #333333; background: white; border-radius: 1rem; margin: 0 auto;"
-                         onmouseover="this.style.background='linear-gradient(135deg, #f02fc2, #6094ea)'; this.style.color='white'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.4)'; this.style.transition='0.5s';"
-                         onmouseout="this.style.background='white'; this.style.color='#333333'; this.style.boxShadow='none';">
-                        前台查看
-                    </div>
-                </a>
-                <a th:href="${verifyCode}" style="margin-left: 5rem">
-                    <div class="butt_to"
-                         style="width: 200px; height: 50px; line-height: 50px; text-align: center; font-size: 20px; font-weight: bold; color: #333333; background: white; border-radius: 1rem; margin: 0 auto;"
-                         onmouseover="this.style.background='linear-gradient(135deg, #f02fc2, #6094ea)'; this.style.color='white'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.4)'; this.style.transition='0.5s';"
-                         onmouseout="this.style.background='white'; this.style.color='#333333'; this.style.boxShadow='none';">
-                        审核通过
-                    </div>
-                </a>
-            </div>
-            <div style="text-align: center;padding-bottom: 1rem;font-size: 15px">此为系统邮件，请勿回复。</div>
-        </div>
-    </div>
-</div>
-<script>
-    // 针对旧版 Outlook 的特殊处理
-    if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0) {
-        var elements = document.querySelectorAll('.butt_to');
-        for (var i = 0; i < elements.length; i++) {
-            elements[i].style.width = '200px';
-            elements[i].style.height = '50px';
-        }
-    }
-</script>
+<body style="margin:0; padding:0; background-color:#f4f7fb; font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; color:#2d3748;">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td style="padding:40px 15px;">
+            <table align="center" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px; border-radius:20px; background:#ffffff; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,0.06);">
+                <!-- Header -->
+                <tr>
+                    <td align="center" style="padding:40px 30px; background:#f8fafc; border-bottom:1px solid #edf2f7;">
+                        <h1 style="margin:0; font-size:26px; font-weight:700;">站长，您收到了新的友链申请</h1>
+                    </td>
+                </tr>
+                <!-- Content -->
+                <tr>
+                    <td style="padding:30px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size:16px; line-height:1.8;">
+                            <tr><td style="padding:8px 0; color:#718096;"><strong>网站名称：</strong> <span th:text="${name}" style="color:#2d3748;"></span></td></tr>
+                            <tr><td style="padding:8px 0; color:#718096;"><strong>网站地址：</strong> <a th:href="${url}" th:text="${url}" style="color:#667eea; text-decoration:none;"></a></td></tr>
+                            <tr><td style="padding:8px 0; color:#718096;"><strong>网站描述：</strong> <span th:text="${description}" style="color:#2d3748;"></span></td></tr>
+                            <tr><td style="padding:8px 0; color:#718096;"><strong>申请人邮箱：</strong> <span th:text="${linkEmail}" style="color:#2d3748;"></span></td></tr>
+                            <tr>
+                                <td style="padding:15px 0 0 0;" valign="top">
+                                    <strong style="color:#718096;">背景图片预览：</strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:10px 0 0 0;">
+                                    <img th:src="${background}" alt="网站背景" width="540" style="display:block; max-width:540px; border-radius:12px;" />
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- CTA Buttons -->
+                <tr>
+                    <td align="center" style="padding:10px 30px 40px;">
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td align="center" style="padding:0 10px;">
+                                    <a th:href="${toUrl}" target="_blank" style="text-decoration:none; background:#e2e8f0; color:#4a5568; padding:14px 30px; border-radius:40px; font-size:15px; font-weight:600; display:inline-block;">
+                                        🔗 前台查看
+                                    </a>
+                                </td>
+                                <td align="center" style="padding:0 10px;">
+                                    <a th:href="${verifyCode}" target="_blank" style="text-decoration:none; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; padding:14px 30px; border-radius:40px; font-size:15px; font-weight:600; box-shadow:0 6px 15px rgba(118,75,162,0.3); display:inline-block;">
+                                        ✅ 审核通过
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                        <p style="font-size:13px; color:#a0aec0; margin-top:20px;">“审核通过”按钮7天内有效</p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

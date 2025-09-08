@@ -9,7 +9,7 @@ let router = createRouter({
     routes: constantRouter
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
     // 用户是否登录
     const isLogin = GET_TOKEN()
     // 查看文章详情页，滚动条回到顶部
@@ -20,7 +20,7 @@ router.beforeEach((to, from, next) => {
     }
     window.document.title = to.meta.title as string
     // 用户登录了，跳转到登录页，直接跳转到首页
-    if (to.name?.startsWith(('welcome-')) && isLogin) {
+    if (typeof to.name !== "string" || to.name?.startsWith(('welcome-')) && isLogin) {
         next('/')
     } else {
         next()

@@ -1,9 +1,9 @@
 package xyz.kuailemao.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * (User)表服务实现类
+ * (User)表服务实现类 (已使用 Jackson 重构)
  *
  * @author kuailemao
  * @since 2023-10-10 19:33:44
@@ -95,6 +95,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Resource
     private IpService ipService;
 
+    // 注入 Spring Boot 自动配置的 ObjectMapper
+    @Resource
+    private ObjectMapper objectMapper;
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -111,36 +115,44 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = null;
         // 判断是否第三方登录
         if (typeHeader != null) {
-            // getee
-            if (typeHeader.equals(RegisterOrLoginTypeEnum.GITEE.getStrategy())) {
-                String result = HttpUtils.sendGet(UrlEnum.GITEE_USER_INFO.getUrl(), "access_token=" + accessToken);
-                JSONObject jsonObject = JSON.parseObject(result);
-                Integer uuid = (Integer) jsonObject.get(SQLConst.ID);
-                user = userMapper.selectById(uuid);
-            }
-            // github
-            if (typeHeader.equals(RegisterOrLoginTypeEnum.GITHUB.getStrategy())) {
-                OkHttpClient client = new OkHttpClient();
-                Headers headers = new Headers.Builder()
-                        .add(RequestHeaderEnum.GITHUB_USER_INFO.getHeader(), RequestHeaderEnum.GITHUB_USER_INFO.getContent())
-                        .add(RespConst.TOKEN_HEADER, RespConst.TOKEN_PREFIX + accessToken)
-                        .build();
-                Request getRequest = new Request.Builder()
-                        .url(UrlEnum.GITHUB_USER_INFO.getUrl())
-                        .method(UrlEnum.GITHUB_USER_INFO.getMethod(), null)
-                        .headers(headers)
-                        .build();
-                try (Response response = client.newCall(getRequest).execute()) {
-                    JSONObject jsonObject;
-                    if (response.body() != null) {
-                        jsonObject = JSON.parseObject(response.body().string());
-                        Integer uuid = (Integer) jsonObject.get(SQLConst.ID);
+            try {
+                // gitee
+                if (typeHeader.equals(RegisterOrLoginTypeEnum.GITEE.getStrategy())) {
+                    String result = HttpUtils.sendGet(UrlEnum.GITEE_USER_INFO.getUrl(), "access_token=" + accessToken);
+                    JsonNode jsonNode = objectMapper.readTree(result);
+                    // 安全地获取 id
+                    if (jsonNode != null && jsonNode.has(SQLConst.ID)) {
+                        long uuid = jsonNode.get(SQLConst.ID).asLong();
                         user = userMapper.selectById(uuid);
                     }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
                 }
-
+                // github
+                if (typeHeader.equals(RegisterOrLoginTypeEnum.GITHUB.getStrategy())) {
+                    OkHttpClient client = new OkHttpClient();
+                    Headers headers = new Headers.Builder()
+                            .add(RequestHeaderEnum.GITHUB_USER_INFO.getHeader(), RequestHeaderEnum.GITHUB_USER_INFO.getContent())
+                            .add(RespConst.TOKEN_HEADER, RespConst.TOKEN_PREFIX + accessToken)
+                            .build();
+                    Request getRequest = new Request.Builder()
+                            .url(UrlEnum.GITHUB_USER_INFO.getUrl())
+                            .method(UrlEnum.GITHUB_USER_INFO.getMethod(), null)
+                            .headers(headers)
+                            .build();
+                    try (Response response = client.newCall(getRequest).execute()) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            String responseBody = response.body().string();
+                            JsonNode jsonNode = objectMapper.readTree(responseBody);
+                            // 安全地获取 id
+                            if (jsonNode != null && jsonNode.has(SQLConst.ID)) {
+                                long uuid = jsonNode.get(SQLConst.ID).asLong();
+                                user = userMapper.selectById(uuid);
+                            }
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                log.error("第三方登录获取用户信息失败", e);
+                throw new BadCredentialsException("第三方登录认证失败，无法获取用户信息", e);
             }
         } else {
             user = findAccountByNameOrEmail(username);
@@ -269,7 +281,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .gender(UserConst.DEFAULT_GENDER)
                 .avatar(UserConst.DEFAULT_AVATAR)
                 .intro(UserConst.DEFAULT_INTRODUCTION)
-                .registerType(RegisterOrLoginTypeEnum.EMAIL.getRegisterType())
                 .isDeleted(UserConst.DEFAULT_STATUS)
                 .email(userRegisterDTO.getEmail())
                 .loginTime(date).build();
@@ -445,8 +456,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     private boolean userIsExist(String username, String email) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(User::getUsername, username).or().eq(User::getEmail, email);
-        return this.userMapper.selectOne(wrapper) != null;
+        // 修复逻辑：username 和 email 可能为 null，需要分别判断
+        if (StringUtils.isNotEmpty(username)) {
+            wrapper.eq(User::getUsername, username);
+        }
+        if (StringUtils.isNotEmpty(email)) {
+            // 如果 username 也存在，则使用 or 连接
+            if (StringUtils.isNotEmpty(username)) {
+                wrapper.or();
+            }
+            wrapper.eq(User::getEmail, email);
+        }
+        // 如果 username 和 email 都为空，不应该执行查询
+        if (!StringUtils.isNotEmpty(username) && !StringUtils.isNotEmpty(email)) {
+            return false;
+        }
+        return this.userMapper.exists(wrapper);
     }
 
     /**

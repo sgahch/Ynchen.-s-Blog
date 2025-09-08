@@ -1,0 +1,90 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 标题 -->
+  <text x="400" y="30" font-family="Arial" font-size="24" text-anchor="middle" fill="#333">Ruyu-Blog 前端架构图</text>
+  
+  <!-- 背景网格 -->
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#eee" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="600" fill="url(#grid)"/>
+  
+  <!-- 浏览器层 -->
+  <rect x="300" y="60" width="200" height="40" rx="5" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/>
+  <text x="400" y="85" font-family="Arial" font-size="16" text-anchor="middle" fill="#333">浏览器</text>
+  
+  <!-- 连接线 -->
+  <line x1="400" y1="100" x2="400" y2="120" stroke="#666" stroke-width="2"/>
+  
+  <!-- 框架与路由层 -->
+  <rect x="250" y="120" width="300" height="50" rx="5" fill="#e8f5e9" stroke="#388e3c" stroke-width="2"/>
+  <text x="400" y="145" font-family="Arial" font-size="16" text-anchor="middle" fill="#333">Vue 3 + Vue Router</text>
+  <text x="400" y="165" font-family="Arial" font-size="14" text-anchor="middle" fill="#555">路由管理 & 组件挂载</text>
+  
+  <!-- 连接线 -->
+  <line x1="300" y1="170" x2="200" y2="200" stroke="#666" stroke-width="2"/>
+  <line x1="400" y1="170" x2="400" y2="200" stroke="#666" stroke-width="2"/>
+  <line x1="500" y1="170" x2="600" y2="200" stroke="#666" stroke-width="2"/>
+  
+  <!-- 状态管理层 -->
+  <rect x="350" y="200" width="100" height="40" rx="5" fill="#fff3e0" stroke="#f57c00" stroke-width="2"/>
+  <text x="400" y="225" font-family="Arial" font-size="16" text-anchor="middle" fill="#333">Pinia</text>
+  
+  <!-- 组件层 -->
+  <rect x="100" y="200" width="200" height="120" rx="5" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="200" y="230" font-family="Arial" font-size="16" text-anchor="middle" fill="#333">页面组件</text>
+  <text x="200" y="260" font-family="Arial" font-size="14" text-anchor="middle" fill="#555">首页</text>
+  <text x="200" y="280" font-family="Arial" font-size="14" text-anchor="middle" fill="#555">文章详情</text>
+  <text x="200" y="300" font-family="Arial" font-size="14" text-anchor="middle" fill="#555">用户中心</text>
+  
+  <rect x="500" y="200" width="200" height="120" rx="5" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="600" y="230" font-family="Arial" font-size="16" text-anchor="middle" fill="#333">公共组件</text>
+  <text x="600" y="260" font-family="Arial" font-size="14" text-anchor="middle" fill="#555">导航栏</text>
+  <text x="600" y="280" font-family="Arial" font-size="14" text-anchor="middle" fill="#555">评论区</text>
+  <text x="600" y="300" font-family="Arial" font-size="14" text-anchor="middle" fill="#555">分页组件</text>
+  
+  <!-- 连接线 -->
+  <line x1="200" y1="320" x2="200" y2="350" stroke="#666" stroke-width="2"/>
+  <line x1="400" y1="240" x2="400" y2="350" stroke="#666" stroke-width="2"/>
+  <line x1="600" y1="320" x2="600" y2="350" stroke="#666" stroke-width="2"/>
+  
+  <!-- 服务与API层 -->
+  <rect x="200" y="350" width="400" height="50" rx="5" fill="#e0f7fa" stroke="#006064" stroke-width="2"/>
+  <text x="400" y="375" font-family="Arial" font-size="16" text-anchor="middle" fill="#333">Axios + 接口封装</text>
+  <text x="400" y="395" font-family="Arial" font-size="14" text-anchor="middle" fill="#555">API请求 & 响应处理</text>
+  
+  <!-- 连接线 -->
+  <line x1="400" y1="400" x2="400" y2="430" stroke="#666" stroke-width="2"/>
+  
+  <!-- 样式与工具层 -->
+  <rect x="200" y="430" width="400" height="80" rx="5" fill="#fff3e0" stroke="#f57c00" stroke-width="2"/>
+  <text x="400" y="455" font-family="Arial" font-size="16" text-anchor="middle" fill="#333">样式与工具库</text>
+  <text x="200" y="485" font-family="Arial" font-size="14" text-anchor="middle" fill="#555">Tailwind CSS</text>
+  <text x="400" y="485" font-family="Arial" font-size="14" text-anchor="middle" fill="#555">Font Awesome</text>
+  <text x="600" y="485" font-family="Arial" font-size="14" text-anchor="middle" fill="#555">工具函数</text>
+  
+  <!-- 连接线 -->
+  <line x1="400" y1="510" x2="400" y2="540" stroke="#666" stroke-width="2"/>
+  
+  <!-- 后端服务 -->
+  <rect x="300" y="540" width="200" height="40" rx="5" fill="#f1f8e9" stroke="#558b2f" stroke-width="2"/>
+  <text x="400" y="565" font-family="Arial" font-size="16" text-anchor="middle" fill="#333">后端RESTful API</text>
+  
+  <!-- 装饰元素 -->
+  <circle cx="400" cy="300" r="200" fill="none" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+  <circle cx="400" cy="300" r="120" fill="none" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <!-- 图例 -->
+  <rect x="650" y="40" width="10" height="10" rx="2" fill="#e8f5e9" stroke="#388e3c" stroke-width="1"/>
+  <text x="665" y="48" font-family="Arial" font-size="10" text-anchor="start" fill="#333">框架层</text>
+  
+  <rect x="650" y="60" width="10" height="10" rx="2" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="1"/>
+  <text x="665" y="68" font-family="Arial" font-size="10" text-anchor="start" fill="#333">组件层</text>
+  
+  <rect x="650" y="80" width="10" height="10" rx="2" fill="#fff3e0" stroke="#f57c00" stroke-width="1"/>
+  <text x="665" y="88" font-family="Arial" font-size="10" text-anchor="start" fill="#333">状态管理</text>
+  
+  <rect x="650" y="100" width="10" height="10" rx="2" fill="#e0f7fa" stroke="#006064" stroke-width="1"/>
+  <text x="665" y="108" font-family="Arial" font-size="10" text-anchor="start" fill="#333">API服务</text>
+</svg>

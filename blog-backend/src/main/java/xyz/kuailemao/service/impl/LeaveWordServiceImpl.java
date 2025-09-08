@@ -1,9 +1,14 @@
 package xyz.kuailemao.service.impl;
 
-import com.alibaba.fastjson.JSON;
+// 移除 fastjson 的 import
+// import com.alibaba.fastjson.JSON;
+// 引入 jackson 的相关类
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import xyz.kuailemao.constants.FunctionConst;
@@ -36,6 +41,7 @@ import java.util.stream.Collectors;
  * @author kuailemao
  * @since 2023-11-03 15:01:11
  */
+@Slf4j
 @Service("leaveWordService")
 public class LeaveWordServiceImpl extends ServiceImpl<LeaveWordMapper, LeaveWord> implements LeaveWordService {
 
@@ -53,6 +59,10 @@ public class LeaveWordServiceImpl extends ServiceImpl<LeaveWordMapper, LeaveWord
 
     @Resource
     private LeaveWordMapper leaveWordMapper;
+
+    // 注入 ObjectMapper 用于 JSON 解析
+    @Resource
+    private ObjectMapper objectMapper;
 
     @Override
     public List<LeaveWordVO> getLeaveWordList(String id) {
@@ -81,11 +91,20 @@ public class LeaveWordServiceImpl extends ServiceImpl<LeaveWordMapper, LeaveWord
 
     @Override
     public ResponseResult<Void> userLeaveWord(String content) {
-        String parse = (String) JSON.parse(content);
-        if (parse.length() > FunctionConst.LEAVE_WORD_CONTENT_LENGTH) {
+        // ==================== 修改点: 使用 Jackson 解析 JSON 字符串 ====================
+        String parsedContent;
+        try {
+            // 将 JSON 格式的字符串（例如 "\"hello\""）解析为普通的 Java 字符串（"hello"）
+            parsedContent = objectMapper.readValue(content, String.class);
+        } catch (JsonProcessingException e) {
+            log.warn("解析留言内容失败, content: {}", content, e);
+            return ResponseResult.failure("留言内容格式错误");
+        }
+
+        if (parsedContent.length() > FunctionConst.LEAVE_WORD_CONTENT_LENGTH) {
             return ResponseResult.failure("留言内容过长");
         }
-        LeaveWord build = LeaveWord.builder().content(parse)
+        LeaveWord build = LeaveWord.builder().content(parsedContent) // 使用解析后的内容
                 .userId(SecurityUtils.getUserId()).build();
 
         if (this.save(build)){

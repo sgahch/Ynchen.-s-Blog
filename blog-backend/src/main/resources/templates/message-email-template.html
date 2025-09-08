@@ -1,136 +1,56 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>欢迎邮件</title>
-    <style type="text/css">
-        /* 媒体查询 */
-        @media screen and (max-width: 740px) {
-            .div_container {
-                font-size: 16px !important;
-            }
-
-            .but-container {
-                margin-top: 1rem !important;
-            }
-
-            .butt_to {
-                width: 150px !important;
-                height: 40px !important;
-                line-height: 40px !important;
-                font-size: 16px !important;
-            }
-        }
-
-        @media screen and (max-width: 550px) {
-            .title_container {
-                flex-direction: column !important;
-            }
-
-            .title_container div:nth-of-type(2) {
-                margin-top: .5rem !important;
-            }
-        }
-
-        .butt_to:hover {
-            cursor: pointer;
-            background: linear-gradient(135deg, #f02fc2, #6094ea);
-            color: white;
-            transition: 0.5s;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-        }
-    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="'新留言通知 - ' + ${websiteName}">新留言通知</title>
 </head>
-<body>
-<div>
-    <div class="div_container"
-         style="
-         display: flex;
-         justify-content: center;
-         align-items: center;
-         flex-direction: column;
-         font-size: 20px;
-         color: #333333;
-         border-radius: 1rem;
-         min-height: 100vh;
-         width: 100%;
-         background: linear-gradient(135deg, #f02fc2, #6094ea);
-">
-        <div style="height: 100%;width: 100%;display: flex;flex-direction: column;align-items: center;justify-content: center">
-            <div class="avatar_container" style="width: 150px; height: 150px; margin: 0 auto; padding-top: 2rem;">
-                <img src="https://image.kuailemao.xyz/blog/websiteInfo/avatar/52e4b3e9-b1e0-4e9b-ab6e-4effc237ab1a.jpg"
-                     alt="头像"
-                     style="width: 100%; height: 100%; border-radius: 40%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);">
-            </div>
-            <div class="title_container"
-                 style="
-                 margin-top: 20px;
-                 margin-bottom: 40px;
-                 display: flex;
-                 justify-content: center;
-                 align-items: center;
-            ">
-                <div style="display: flex;flex-direction: column;align-items: center">
-                    <span style="color: #ffffff;font-weight: bold;font-size: 25px;margin-bottom: 20px">Ruyu-Blog</span>
-                    <span style="color: #ffffff;font-weight: bold;font-size: 25px">有新的留言</span>
-                </div>
-            </div>
-            <div style="margin: 1rem 0;width: 90%;display: flex;justify-content: center;align-items: center">
-                <div style="
-                width: 95%;
-                height: auto;
-                min-height: 200px;
-                border: 1px solid #E4E7ED;
-                border-radius: 5px;
-                background-color: white;
-            ">
-                    <!-- 头像 名称 -->
-                    <div style="display: flex;justify-content: space-between;align-items: center;padding: 20px">
-                        <div style="display: flex;justify-content: center;align-items: center">
-                            <div class="avatar_container" style="width: 50px; height: 50px; border-radius: 50%;margin-right: 20px">
-                                <img th:src="${avatar}"
-                                     alt="头像"
-                                     style="width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);">
-                            </div>
-                            <div style="font-size: 20px" th:text="${nickname}">
-
-                            </div>
-                        </div>
-                        <div style="color: #999999;font-size: 15px" th:text="${time}">
-
-                        </div>
-                    </div>
-                    <hr style="background-color: #DCDFE6; height: 1px; border: none;margin: 0">
-                    <!-- 内容 -->
-                    <div style="padding: 20px" th:text="${content}">
-
-                    </div>
-                </div>
-            </div>
-            <div class="but-container"
-                 style="display: flex; justify-content: space-around; align-items: center; margin: 2rem 0;">
-                <a th:href="${toUrl}">
-                    <div class="butt_to"
-                         style="width: 200px; height: 50px; line-height: 50px; text-align: center; font-size: 20px; font-weight: bold; color: #333333; background: white; border-radius: 1rem; margin: 0 auto;"
-                         onmouseover="this.style.background='linear-gradient(135deg, #f02fc2, #6094ea)'; this.style.color='white'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.4)'; this.style.transition='0.5s';"
-                         onmouseout="this.style.background='white'; this.style.color='#333333'; this.style.boxShadow='none';">
-                        前往查看
-                    </div>
-                </a>
-            </div>
-            <div style="text-align: center;padding-bottom: 1rem;font-size: 15px">此为系统邮件，请勿回复。</div>
-        </div>
-    </div>
-</div>
-<script>
-    // 针对旧版 Outlook 的特殊处理
-    if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0) {
-        var elements = document.querySelectorAll('.butt_to');
-        for (var i = 0; i < elements.length; i++) {
-            elements[i].style.width = '200px';
-            elements[i].style.height = '50px';
-        }
-    }
-</script>
+<body style="margin:0; padding:0; background-color:#f4f7fb; font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; color:#2d3748;">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td style="padding:40px 15px;">
+            <table align="center" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px; border-radius:20px; background:#ffffff; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,0.06);">
+                <!-- Header -->
+                <tr>
+                    <td align="center" style="padding:40px 30px; background:#f8fafc; border-bottom:1px solid #edf2f7;">
+                        <h1 style="margin:0; font-size:26px; font-weight:700;">您在留言板收到了新的留言</h1>
+                    </td>
+                </tr>
+                <!-- Content -->
+                <tr>
+                    <td style="padding:30px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size:16px; line-height:1.7;">
+                            <!-- Message Card -->
+                            <tr>
+                                <td>
+                                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background:#f8fafc; border-radius:12px; padding:20px;">
+                                        <tr>
+                                            <td width="60" valign="top">
+                                                <img th:src="${avatar}" alt="头像" width="50" height="50" style="border-radius:50%;" />
+                                            </td>
+                                            <td style="padding-left:15px;">
+                                                <p style="margin:0; font-size:16px; font-weight:600;" th:text="${nickname}"></p>
+                                                <p style="margin:4px 0 12px; font-size:13px; color:#a0aec0;" th:text="${#dates.format(time, 'yyyy-MM-dd HH:mm')}"></p>
+                                                <p style="margin:0; font-size:16px; color:#4a5568;" th:text="${content}"></p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- CTA Button -->
+                <tr>
+                    <td align="center" style="padding:0 30px 40px;">
+                        <a th:href="${toUrl}" target="_blank" style="text-decoration:none; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; padding:14px 30px; border-radius:40px; font-size:15px; font-weight:600; box-shadow:0 6px 15px rgba(118,75,162,0.3); display:inline-block;">
+                            📨 前往留言板
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

@@ -1,6 +1,8 @@
 package xyz.kuailemao.controller;
 
-import com.alibaba.fastjson.JSON;
+// 1. 引入 Jackson 的 ObjectMapper
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -21,6 +23,7 @@ import xyz.kuailemao.domain.vo.TreeHoleVO;
 import xyz.kuailemao.service.TreeHoleService;
 import xyz.kuailemao.utils.ControllerUtils;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -37,12 +40,28 @@ public class TreeHoleController {
     @Resource
     private TreeHoleService treeHoleService;
 
+    // 2. 注入一个 ObjectMapper Bean，这是更高效和推荐的做法
+    @Resource
+    private ObjectMapper objectMapper;
+
     @CheckBlacklist
     @Operation(summary = "添加树洞")
     @AccessLimit(seconds = 60, maxCount = 60)
     @PostMapping("/auth/addTreeHole")
-    public ResponseResult<Void> addTreeHole(@Valid @NotNull @RequestBody String content) {
-        return treeHoleService.addTreeHole(JSON.parseObject(content).getString("content"));
+    public ResponseResult<Void> addTreeHole(@Valid @NotNull @RequestBody String requestBody) {
+        // 3. 使用 Jackson 来解析JSON字符串
+        try {
+            JsonNode rootNode = objectMapper.readTree(requestBody);
+            if (rootNode.has("content")) {
+                String content = rootNode.get("content").asText();
+                return treeHoleService.addTreeHole(content);
+            } else {
+                return ResponseResult.failure("请求体中缺少 'content' 字段");
+            }
+        } catch (IOException e) {
+            // 当传入的字符串不是一个合法的JSON时，会抛出异常
+            return ResponseResult.failure("无效的JSON格式");
+        }
     }
 
     @Operation(summary = "查看树洞")
@@ -87,5 +106,4 @@ public class TreeHoleController {
     public ResponseResult<Void> delete(@RequestBody List<Long> ids) {
         return treeHoleService.deleteTreeHole(ids);
     }
-
 }
