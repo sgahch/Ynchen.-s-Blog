@@ -5,7 +5,7 @@ import {
   DocumentCopy,
   Files,
   Fries,
-  Headset,
+  // Headset,
   HomeFilled,
   Postcard,
   PriceTag,
@@ -41,8 +41,7 @@ function changeToggle({detail}) {
   mode.value = detail
 }
 
-// 是否显示音乐模块
-const env = import.meta.env
+
 
 const isMenuVisible = ref(true);
 const isTransparent = ref(true);
@@ -198,14 +197,7 @@ onUnmounted(() => {
               <span>友链</span>
             </span>
           </div>
-          <div class="menus_item" @click="router.push('/music')" v-if="env.VITE_MUSIC_FRONTEND_URL">
-            <span>
-              <el-icon>
-                <Headset/>
-              </el-icon>
-             <span>音乐</span>
-            </span>
-          </div>
+
           <div class="menus_item" @click="router.push('/photo')">
             <span>
               <el-icon>

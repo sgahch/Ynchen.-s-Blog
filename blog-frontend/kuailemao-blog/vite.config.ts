@@ -14,7 +14,7 @@ import autoprefixer from 'autoprefixer'
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => {
     return {
-        base: '/',
+        base: '/blog',
         plugins: [
             viteCompression({
                 verbose: true, // 是否在控制台中输出压缩结果
@@ -98,12 +98,8 @@ export default defineConfig(({ mode }: ConfigEnv) => {
                     target: `${loadEnv(mode, process.cwd()).VITE_SERVE}`,
                     changeOrigin: true,
                     rewrite: (path) => path.replace(/^\/api/, '')
-                },
-                '/wapi': {
-                    target: `${loadEnv(mode, process.cwd()).VITE_MUSIC_SERVE}`,
-                    changeOrigin: true,
-                    rewrite: (path) => path.replace(/^\/wapi/, '')
                 }
+
             }
         }
     }

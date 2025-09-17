@@ -43,7 +43,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     private TagMapper tagMapper;
 
     @Override
-    @Cacheable(cacheNames = "tag", key = "'list'") // 为整个列表结果添加缓存
+    @Cacheable(cacheNames = "tag", key = "'list'")
     public List<TagVO> listAllTag() {
         log.info("=========== 从数据库查询所有标签及其文章数 ============");
         // 第1步：一次性查询出所有标签
@@ -54,14 +54,22 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
 
         // 第2步：一次性查询出所有标签对应的文章计数值
         Map<Long, Map<String, Object>> countMapResult = articleTagMapper.selectArticleCountByTagId();
-        // 将其转换为更易于使用的 Map<Long, Long>
-        Map<Long, Long> articleCountMap = countMapResult.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> ((Number) entry.getValue().get("article_count")).longValue()
-                ));
 
-        // 第3步：在内存中进行数据组装，不再有数据库查询
+        // ==> 在这里添加防御性代码 <==
+        // 即使查询结果为空，也创建一个空的Map，防止后续代码出现空指针
+        final Map<Long, Long> articleCountMap;
+        if (countMapResult != null && !countMapResult.isEmpty()) {
+            articleCountMap = countMapResult.entrySet().stream()
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            entry -> ((Number) entry.getValue().get("article_count")).longValue()
+                    ));
+        } else {
+            // 如果数据库查询结果是 null 或空，则初始化一个空 Map
+            articleCountMap = Collections.emptyMap();
+        }
+
+        // 第3步：在内存中进行数据组装 (现在这里绝对安全，不会有空指针)
         return tags.stream().map(tag ->
                 tag.asViewObject(TagVO.class, item ->
                         // 从Map中获取计数，如果某个标签没有文章，getOrDefault会返回0

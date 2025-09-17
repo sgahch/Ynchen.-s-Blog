@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary; // 确保导入了这个包
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -34,8 +35,10 @@ public class RedisConfig {
 
     /**
      * 配置 RedisTemplate，注入并使用上面创建的、最终正确的序列化器。
+     * 添加 @Primary 注解，确保这是默认的、首选的 RedisTemplate 实例。
      */
     @Bean
+    @Primary // <== 添加 @Primary 注解，消除注入歧义
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory, GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);

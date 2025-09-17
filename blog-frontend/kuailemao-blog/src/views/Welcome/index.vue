@@ -1,23 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { getUserInfo } from "@/apis/user";
+import { ref } from "vue";
+// import { getUserInfo } from "@/apis/user"; // 不再需要，已移除
 
-const isLoading = ref(true);
-const webmasterAvatar = ref("");
+// 直接将图片的URL硬编码在这里
+// 这个URL是您之前在浏览器中确认可以访问的那个
+const webmasterAvatar = ref("http://192.168.182.128:9000/blog/websiteInfo/avatar/a49e54ac-c169-47c2-92f1-78c1e1f5bb3c.jpg");
 
-onMounted(async () => {
-  try {
-    const res = await getUserInfo();
-    webmasterAvatar.value = res?.data?.avatar || "";
-  } catch (e) {
-    console.error("获取用户头像失败", e);
-    webmasterAvatar.value = "";
-  } finally {
-    isLoading.value = false;
-  }
-});
+// 因为是硬编码，不再需要异步加载，所以 onMounted 和 isLoading 逻辑都已移除
 </script>
-
 
 <template>
   <!-- 头部组件 -->
@@ -27,21 +17,12 @@ onMounted(async () => {
   <div style="width: 100vw; height: 100vh; overflow: hidden; display: flex">
     <!-- 左边区域：背景图 -->
     <div class="left-card">
-      <!-- 使用Element Plus的骨架屏组件来优化加载体验 -->
-      <el-skeleton style="width: 100%; height: 100%" :loading="isLoading" animated>
-        <!-- #template 插槽定义了在加载时显示的内容 -->
-        <template #template>
-          <el-skeleton-item variant="image" style="width: 100%; height: 100%" />
-        </template>
-        <!-- #default 插槽定义了加载完成后显示的内容 -->
-        <template #default>
-          <el-image
-              style="width: 100%; height: 100%"
-              fit="cover"
-              :src="webmasterAvatar"
-          />
-        </template>
-      </el-skeleton>
+      <!-- 移除骨架屏，直接使用 el-image 组件 -->
+      <el-image
+          style="width: 100%; height: 100%"
+          fit="cover"
+          :src="webmasterAvatar"
+      />
     </div>
 
     <!-- 欢迎文字 (绝对定位) -->
