@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.kuailemao.constants.SQLConst;
 import xyz.kuailemao.constants.WebsiteInfoConst;
+import xyz.kuailemao.domain.dto.ArticleStatsDTO;
 import xyz.kuailemao.domain.dto.StationmasterInfoDTO;
 import xyz.kuailemao.domain.dto.WebsiteInfoDTO;
 import xyz.kuailemao.domain.entity.Article;
@@ -25,6 +26,7 @@ import xyz.kuailemao.utils.FileUploadUtils;
 import xyz.kuailemao.utils.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -79,29 +81,44 @@ public class WebsiteInfoServiceImpl extends ServiceImpl<WebsiteInfoMapper, Websi
         }
     }
 
+    // 查询网站信息(new)
     @Override
     public WebsiteInfoVO selectWebsiteInfo() {
-        WebsiteInfoVO websiteInfoVO = this.getById(WebsiteInfoConst.WEBSITE_INFO_ID).asViewObject(WebsiteInfoVO.class);
-        // 运行时长
-        if (StringUtils.isNotNull(websiteInfoVO)) {
-            if (articleMapper.selectCount(null) <= 0)  return websiteInfoVO;
-            LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
-            wrapper.select(Article::getUpdateTime).orderByDesc(Article::getUpdateTime).last(SQLConst.LIMIT_ONE_SQL);
-            websiteInfoVO.setLastUpdateTime(articleMapper.selectOne(wrapper).getUpdateTime());
-            websiteInfoVO.setArticleCount(articleMapper.selectCount(null));
-            List<String> listArticleContent = articleMapper.selectList(null).stream().map(Article::getArticleContent).toList();
-            // 合成一个string
-            String mergedString = String.join("", listArticleContent);
-            websiteInfoVO.setWordCount((long) extractTextFromMarkdown(mergedString).length());
-            wrapper.clear();
-            wrapper.select(Article::getVisitCount);
-            websiteInfoVO.setVisitCount(articleMapper.selectObjs(wrapper).stream().mapToLong(visitCount -> (Long) visitCount).sum());
-            websiteInfoVO.setCategoryCount(categoryMapper.selectCount(null));
-            websiteInfoVO.setCommentCount(commentMapper.selectCount(null));
+        WebsiteInfoVO websiteInfoVO = this.getById(WebsiteInfoConst.WEBSITE_INFO_ID)
+                .asViewObject(WebsiteInfoVO.class);
+        if (websiteInfoVO == null) {
+            return null;
+        }
+
+        // 聚合查询文章统计
+        ArticleStatsDTO stats = articleMapper.selectArticleStats();
+        websiteInfoVO.setArticleCount(stats.getArticleCount());
+        websiteInfoVO.setLastUpdateTime(stats.getLastUpdateTime());
+        websiteInfoVO.setVisitCount(stats.getVisitCount());
+
+        // 如果没有文章，直接返回
+        if (stats.getArticleCount() == null || stats.getArticleCount() <= 0) {
             return websiteInfoVO;
         }
-        return null;
+
+        // 字数统计：逐条累加，避免一次性拼接大字符串
+        long charCount = articleMapper.selectList(new LambdaQueryWrapper<Article>()
+                        .select(Article::getArticleContent))
+                .stream()
+                .map(Article::getArticleContent)
+                .filter(Objects::nonNull)
+                .map(this::extractTextFromMarkdown) // 去除 Markdown 标记
+                .mapToLong(String::length)
+                .sum();
+        websiteInfoVO.setWordCount(charCount);
+
+        websiteInfoVO.setCategoryCount(categoryMapper.selectCount(null));
+        websiteInfoVO.setCommentCount(commentMapper.selectCount(null));
+
+        return websiteInfoVO;
     }
+
+
 
     @Transactional
     @Override
@@ -131,7 +148,7 @@ public class WebsiteInfoServiceImpl extends ServiceImpl<WebsiteInfoMapper, Websi
      * @param markdownContent Markdown文档内容
      * @return 文字内容
      */
-    private static String extractTextFromMarkdown(String markdownContent) {
+    private String extractTextFromMarkdown(String markdownContent) {
         // 使用正则表达式匹配Markdown文档中的文字内容，并去掉空格
         Pattern pattern = Pattern.compile("[^#>\\*\\[\\]`\\s]+");
         Matcher matcher = pattern.matcher(markdownContent);

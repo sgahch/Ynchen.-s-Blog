@@ -14,6 +14,7 @@ import {useDark, useToggle} from "@vueuse/core";
 import useWebsiteStore from "@/store/modules/website.ts";
 import DevToolsBlocker from "@/components/DevToolsBlocker/index.vue";
 import ContextMenu from "@/components/ContextMenu/index.vue";
+import { onMounted } from 'vue'
 
 const useWebsite = useWebsiteStore()
 

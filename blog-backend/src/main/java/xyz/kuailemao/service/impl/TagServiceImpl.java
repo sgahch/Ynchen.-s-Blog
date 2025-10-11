@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import xyz.kuailemao.constants.FunctionConst;
 import xyz.kuailemao.domain.dto.SearchTagDTO;
 import xyz.kuailemao.domain.dto.TagDTO;
@@ -46,43 +47,18 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     @Cacheable(cacheNames = "tag", key = "'list'")
     public List<TagVO> listAllTag() {
         log.info("=========== 从数据库查询所有标签及其文章数 ============");
-        // 第1步：一次性查询出所有标签
         List<Tag> tags = this.list();
-        if (tags.isEmpty()) {
+        if (CollectionUtils.isEmpty(tags)) {
             return Collections.emptyList();
         }
-
-        // 第2步：一次性查询出所有标签对应的文章计数值
-        Map<Long, Map<String, Object>> countMapResult = articleTagMapper.selectArticleCountByTagId();
-
-        // ==> 在这里添加防御性代码 <==
-        // 即使查询结果为空，也创建一个空的Map，防止后续代码出现空指针
-        final Map<Long, Long> articleCountMap;
-        if (countMapResult != null && !countMapResult.isEmpty()) {
-            articleCountMap = countMapResult.entrySet().stream()
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            entry -> ((Number) entry.getValue().get("article_count")).longValue()
-                    ));
-        } else {
-            // 如果数据库查询结果是 null 或空，则初始化一个空 Map
-            articleCountMap = Collections.emptyMap();
-        }
-
-        // 第3步：在内存中进行数据组装 (现在这里绝对安全，不会有空指针)
+        // 【优化】提取公共方法获取文章计数
+        Map<Long, Long> articleCountMap = getArticleCountMap();
+        // 在内存中进行数据组装
         return tags.stream().map(tag ->
                 tag.asViewObject(TagVO.class, item ->
-                        // 从Map中获取计数，如果某个标签没有文章，getOrDefault会返回0
                         item.setArticleCount(articleCountMap.getOrDefault(tag.getId(), 0L))
                 )
         ).toList();
-    }
-
-    @Override
-    @CacheEvict(cacheNames = "tag", key = "'list'")
-    public ResponseResult<Void> addTag(TagDTO tagDTO) {
-        if (this.save(tagDTO.asViewObject(Tag.class))) return ResponseResult.success();
-        return ResponseResult.failure();
     }
 
     @Override
@@ -92,22 +68,14 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         if (StringUtils.isNotNull(searchTagDTO.getStartTime()) && StringUtils.isNotNull(searchTagDTO.getEndTime()))
             queryWrapper.between(Tag::getCreateTime, searchTagDTO.getStartTime(), searchTagDTO.getEndTime());
 
-        // 第1步：根据搜索条件查询出标签
         List<Tag> tags = tagMapper.selectList(queryWrapper);
-        if (tags.isEmpty()) {
+        if (CollectionUtils.isEmpty(tags)) {
             return Collections.emptyList();
         }
 
-        // 第2步：一次性查询出所有标签对应的文章计数值
-        // (这一步和 listAllTag 完全一样)
-        Map<Long, Map<String, Object>> countMapResult = articleTagMapper.selectArticleCountByTagId();
-        Map<Long, Long> articleCountMap = countMapResult.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> ((Number) entry.getValue().get("article_count")).longValue()
-                ));
-
-        // 第3步：在内存中进行数据组装
+        // 【优化】提取公共方法获取文章计数
+        Map<Long, Long> articleCountMap = getArticleCountMap();
+        // 在内存中进行数据组装
         return tags.stream().map(tag ->
                 tag.asViewObject(TagVO.class, item ->
                         item.setArticleCount(articleCountMap.getOrDefault(tag.getId(), 0L))
@@ -116,34 +84,67 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     }
 
     @Override
-    @Cacheable(cacheNames = "tag", key = "#id") // <-- 添加缓存
+    @Cacheable(cacheNames = "tag", key = "#id")
     public TagVO getTagById(Long id) {
         log.info("=========== 从数据库查询单个标签: {} ============", id);
         Tag tag = tagMapper.selectById(id);
-        return tag != null ? tag.asViewObject(TagVO.class) : null;
+        // 【优化】这里也加上文章计数逻辑，使得单个查询和列表查询数据结构一致
+        if (tag != null) {
+            TagVO tagVO = tag.asViewObject(TagVO.class);
+            Map<Long, Long> articleCountMap = getArticleCountMap();
+            tagVO.setArticleCount(articleCountMap.getOrDefault(tag.getId(), 0L));
+            return tagVO;
+        }
+        return null;
     }
 
     @Transactional
     @Override
-    // 使用 @Caching 一次性管理多个缓存操作
+    // 【优化】使用 @Caching 一次性管理多个缓存操作，覆盖新增和修改场景
     @Caching(evict = {
-            @CacheEvict(cacheNames = "tag", key = "'list'"), // 清除列表缓存
-            @CacheEvict(cacheNames = "tag", key = "#tagDTO.id")  // 清除单个标签的缓存
+            @CacheEvict(cacheNames = "tag", key = "'list'"),      // 1. 清除列表缓存
+            @CacheEvict(cacheNames = "tag", key = "#tagDTO.id", condition = "#tagDTO.id != null")  // 2. 如果是更新操作，清除对应的单个标签缓存
     })
     public ResponseResult<Void> addOrUpdateTag(TagDTO tagDTO) {
-        if (this.saveOrUpdate(tagDTO.asViewObject(Tag.class))) return ResponseResult.success();
+        if (this.saveOrUpdate(tagDTO.asViewObject(Tag.class))) {
+            return ResponseResult.success();
+        }
         return ResponseResult.failure();
     }
 
     @Transactional
     @Override
-    @CacheEvict(cacheNames = "tag", key = "'list'")
+    // 【优化】使用 @Caching 保证清除所有相关缓存
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "tag", key = "'list'"), // 1. 清除列表缓存
+            @CacheEvict(cacheNames = "tag", allEntries = true) // 2. 【保险措施】清除所有单个tag缓存，因为无法在注解中循环ids
+    })
     public ResponseResult<Void> deleteTagByIds(List<Long> ids) {
-        // 是否有剩下文章
         Long count = articleTagMapper.selectCount(new LambdaQueryWrapper<ArticleTag>().in(ArticleTag::getTagId, ids));
-        if (count > 0) return ResponseResult.failure(FunctionConst.TAG_EXIST_ARTICLE);
-        // 执行删除
-        if (this.removeByIds(ids)) return ResponseResult.success();
+        if (count > 0) {
+            return ResponseResult.failure(FunctionConst.TAG_EXIST_ARTICLE);
+        }
+        if (this.removeByIds(ids)) {
+            return ResponseResult.success();
+        }
         return ResponseResult.failure();
     }
+
+    /**
+     * 【优化】提取的私有方法，用于获取所有标签的文章计数值
+     * @return Map<标签ID, 文章数量>
+     */
+    private Map<Long, Long> getArticleCountMap() {
+        // 【修复】修复了潜在的 NullPointerException
+        Map<Long, Map<String, Object>> countMapResult = articleTagMapper.selectArticleCountByTagId();
+        if (CollectionUtils.isEmpty(countMapResult)) {
+            return Collections.emptyMap();
+        }
+        return countMapResult.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> ((Number) entry.getValue().get("article_count")).longValue()
+                ));
+    }
 }
+

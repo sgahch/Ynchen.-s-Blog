@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import xyz.kuailemao.domain.dto.ArticleStatsDTO;
 import xyz.kuailemao.domain.entity.Article;
 import xyz.kuailemao.domain.vo.ArticleVO;
 
@@ -25,4 +26,11 @@ public interface ArticleMapper extends BaseMapper<Article> {
     @Select("SELECT category_id, COUNT(id) as article_count FROM t_article WHERE is_deleted = 0 GROUP BY category_id")
     @MapKey("category_id") // 告诉MyBatis将 category_id 作为Map的Key
     Map<Long, Map<String, Object>> selectArticleCountByCategoryId();
+
+    /**
+     * 查询文章统计信息：总数、最新更新时间、访问量总和
+     */
+    ArticleStatsDTO selectArticleStats();
+
+
 }

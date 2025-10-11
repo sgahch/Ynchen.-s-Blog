@@ -864,7 +864,7 @@ CREATE TABLE `sys_website_info`  (
 -- ----------------------------
 -- Records of sys_website_info
 -- ----------------------------
-INSERT INTO `sys_website_info` VALUES (1, 'http://8.148.31.90:9000/blog/websiteInfo/avatar/d88cb175-7bce-4be6-9057-08ee041301f5.jpg', 'Ruyu', '不经一番寒彻骨，怎得梅花扑鼻香', 'http://8.148.31.90:9000/blog/websiteInfo/background/a447eb3b-31cb-4a8f-af0a-54a30c0d7b81.jpg', 'https://gitee.com/Ynchen666', 'https://github.com/sgahch', 'Ynchen. ~\'s Blog', '欢迎访问我的个人博客，希望你能喜欢！', '欢迎指出网站的不足，给我提供意见', '备案信息', '2024-01-01 16:00:25', '2023-12-27 14:28:10', '2025-08-16 23:35:36', 0);
+INSERT INTO `sys_website_info` VALUES (1, 'http://8.148.31.90:9000/blog/websiteInfo/avatar/d88cb175-7bce-4be6-9057-08ee041301f5.jpg', 'Ruyu', '不经一番寒彻骨，怎得梅花扑鼻香', 'http://8.148.31.90:9000/blog/websiteInfo/background/a447eb3b-31cb-4a8f-af0a-54a30c0d7b81.jpg', 'https://gitee.com/Ynchenhq', 'https://github.com/sgahch', 'Ynchen. ~\'s Blog', '欢迎访问我的个人博客，希望你能喜欢！', '欢迎指出网站的不足，给我提供意见', '备案信息', '2024-01-01 16:00:25', '2023-12-27 14:28:10', '2025-08-16 23:35:36', 0);
 
 -- ----------------------------
 -- Table structure for t_article

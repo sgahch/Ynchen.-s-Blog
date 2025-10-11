@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>综合前端知识点示例</title>
+    <style>
+        /* 基础样式与变量定义 */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #f39c12;
+            --dark-color: #34495e;
+            --light-color: #ecf0f1;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 10%;
+            width: 80%;
+            height: 3px;
+            background-color: var(--accent-color);
+            border-radius: 3px;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        /* 卡片样式 */
+        .profile-card {
+            width: 350px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform var(--transition-speed),
+                box-shadow var(--transition-speed);
+            position: relative;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            margin-bottom: 15px;
+            transition: transform 0.5s ease;
+        }
+
+        .profile-card:hover .profile-pic {
+            transform: scale(1.05) rotate(3deg);
+        }
+
+        .online-status {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            border: 2px solid white;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .info-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-icon {
+            width: 30px;
+            color: var(--primary-color);
+            margin-right: 15px;
+            text-align: center;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .skill-tag {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            transition: all var(--transition-speed);
+        }
+
+        .skill-tag:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .card-footer {
+            padding: 15px 25px;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all var(--transition-speed);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* 表单样式 */
+        .form-section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .form-title {
+            margin-bottom: 25px;
+            color: var(--dark-color);
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .form-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--secondary-color);
+            border-radius: 3px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color var(--transition-speed),
+                box-shadow var(--transition-speed);
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-submit {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-reset {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background-color: #c0392b;
+        }
+
+        /* 动画定义 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .card-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .profile-card {
+                width: 100%;
+                max-width: 350px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* 其他效果 */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            font-size: 0.85rem;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* 进度条样式 */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            background-color: var(--primary-color);
+            transition: width 1s ease-in-out;
+        }
+
+        /* 切换主题按钮 */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--dark-color);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all var(--transition-speed);
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+        <span>🌓</span>
+    </button>
+
+    <div class="container">
+        <header>
+            <h1>综合前端知识点示例</h1>
+            <p>包含HTML结构、CSS样式与JavaScript交互的示例页面</p>
+        </header>
+
+        <div class="card-container">
+            <!-- 个人信息卡片 -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <div class="online-status" title="在线"></div>
+                    <img src="https://picsum.photos/id/64/200/200" alt="用户头像" class="profile-pic">
+                    <h2>张明</h2>
+                    <p>前端开发工程师</p>
+                </div>
+                <div class="card-body">
+                    <div class="info-item">
+                        <div class="info-icon">📍</div>
+                        <div>
+                            <strong>所在地：</strong>北京市
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">📅</div>
+                        <div>
+                            <strong>加入时间：</strong>2020年3月
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">💻</div>
+                        <div>
+                            <strong>技能：</strong>
+                            <div class="skill-list">
+                                <span class="skill-tag">HTML5</span>
+                                <span class="skill-tag">CSS3</span>
+                                <span class="skill-tag">JavaScript</span>
+                                <span class="skill-tag">React</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">📊</div>
+                        <div>
+                            <strong>完成项目：</strong>24个
+                            <div class="progress-container">
+                                <div class="progress-bar" id="projectProgress" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">⭐</div>
+                        <div>
+                            <strong>评分：</strong>
+                            <span class="tooltip">4.8
+                                <span class="tooltip-text">基于126条评价</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-outline" id="contactBtn">联系我</button>
+                    <button class="btn btn-primary" id="messageBtn">发消息</button>
+                </div>
+            </div>
+
+            <!-- 第二个卡片 -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <div class="online-status" title="在线"></div>
+                    <img src="https://picsum.photos/id/26/200/200" alt="用户头像" class="profile-pic">
+                    <h2>李华</h2>
+                    <p>UI/UX设计师</p>
+                </div>
+                <div class="card-body">
+                    <div class="info-item">
+                        <div class="info-icon">📍</div>
+                        <div>
+                            <strong>所在地：</strong>上海市
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">📅</div>
+                        <div>
+                            <strong>加入时间：</strong>2019年7月
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">💻</div>
+                        <div>
+                            <strong>技能：</strong>
+                            <div class="skill-list">
+                                <span class="skill-tag">Figma</span>
+                                <span class="skill-tag">Adobe XD</span>
+                                <span class="skill-tag">UI设计</span>
+                                <span class="skill-tag">原型设计</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">📊</div>
+                        <div>
+                            <strong>完成项目：</strong>36个
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 90%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">⭐</div>
+                        <div>
+                            <strong>评分：</strong>
+                            <span class="tooltip">4.9
+                                <span class="tooltip-text">基于215条评价</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-outline">联系我</button>
+                    <button class="btn btn-primary">发消息</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 表单部分 -->
+        <section class="form-section">
+            <h2 class="form-title">发送消息</h2>
+            <form id="messageForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">姓名</label>
+                        <input type="text" id="name" name="name" required placeholder="请输入您的姓名">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">邮箱</label>
+                        <input type="email" id="email" name="email" required placeholder="请输入您的邮箱">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="recipient">收件人</label>
+                    <select id="recipient" name="recipient" required>
+                        <option value="">请选择收件人</option>
+                        <option value="zhangming">张明</option>
+                        <option value="lihua">李华</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">主题</label>
+                    <input type="text" id="subject" name="subject" placeholder="消息主题">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">消息内容</label>
+                    <textarea id="message" name="message" required placeholder="请输入您的消息内容..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="reset" class="btn btn-reset">重置</button>
+                    <button type="submit" class="btn btn-submit">发送消息</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        // DOM加载完成后执行
+        document.addEventListener('DOMContentLoaded', function () {
+            // 进度条动画效果
+            setTimeout(() => {
+                document.getElementById('projectProgress').style.width = '100%';
+            }, 500);
+
+            // 消息按钮点击事件
+            document.getElementById('messageBtn').addEventListener('click', function () {
+                document.getElementById('recipient').value = 'zhangming';
+                document.querySelector('.form-section').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+
+            // 联系按钮点击事件
+            document.getElementById('contactBtn').addEventListener('click', function () {
+                alert('张明的联系方式：\n邮箱：zhangming@example.com\n电话：138****5678');
+            });
+
+            // 表单提交处理
+            document.getElementById('messageForm').addEventListener('submit', function (e) {
+                e.preventDefault(); // 阻止表单默认提交
+
+                // 获取表单数据
+                const formData = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    recipient: document.getElementById('recipient').value,
+                    subject: document.getElementById('subject').value,
+                    message: document.getElementById('message').value
+                };
+
+                // 简单验证
+                if (!formData.recipient) {
+                    alert('请选择收件人');
+                    return;
+                }
+
+                // 显示提交成功信息
+                alert(`消息发送成功！\n收件人: ${formData.recipient === 'zhangming' ? '张明' : '李华'}\n主题: ${formData.subject || '无主题'}`);
+
+                // 重置表单
+                this.reset();
+            });
+
+            // 主题切换功能
+            const themeToggle = document.getElementById('themeToggle');
+            let darkMode = false;
+
+            themeToggle.addEventListener('click', function () {
+                darkMode = !darkMode;
+                const root = document.documentElement;
+
+                if (darkMode) {
+                    // 切换到暗色模式
+                    root.style.setProperty('--primary-color', '#4da6ff');
+                    root.style.setProperty('--secondary-color', '#55e6c1');
+                    root.style.setProperty('--dark-color', '#ecf0f1');
+                    root.style.setProperty('--light-color', '#2c3e50');
+                    document.body.style.backgroundColor = '#1a2530';
+                    themeToggle.innerHTML = '<span>☀️</span>';
+                } else {
+                    // 切换到亮色模式
+                    root.style.setProperty('--primary-color', '#3498db');
+                    root.style.setProperty('--secondary-color', '#2ecc71');
+                    root.style.setProperty('--dark-color', '#34495e');
+                    root.style.setProperty('--light-color', '#ecf0f1');
+                    document.body.style.backgroundColor = '#f9f9f9';
+                    themeToggle.innerHTML = '<span>🌙</span>';
+                }
+            });
+
+            // 为所有技能标签添加点击事件
+            document.querySelectorAll('.skill-tag').forEach(tag => {
+                tag.addEventListener('click', function () {
+                    this.classList.toggle('active');
+                    if (this.classList.contains('active')) {
+                        this.style.backgroundColor = 'var(--primary-color)';
+                        this.style.color = 'white';
+                    } else {
+                        this.style.backgroundColor = 'var(--light-color)';
+                        this.style.color = 'var(--dark-color)';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -24,7 +24,6 @@ import xyz.kuailemao.domain.response.ResponseResult;
 import xyz.kuailemao.mapper.UserMapper;
 import xyz.kuailemao.utils.IpUtils;
 import xyz.kuailemao.utils.SecurityUtils;
-import xyz.kuailemao.utils.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -96,7 +95,7 @@ public class LogAspect {
 
         HttpServletRequest request = SecurityUtils.getCurrentHttpRequest();
         if (request == null) {
-            log.warn("无法获取 HttpServletRequest，跳过日志记录");
+            log.warn("无法获取 HttpServletRequest,跳过日志记录");
             return;
         }
 
@@ -140,7 +139,7 @@ public class LogAspect {
 
         HttpServletRequest request = SecurityUtils.getCurrentHttpRequest();
         if (request == null) {
-            log.error("无法获取 HttpServletRequest，异常日志记录不完整", e);
+            log.error("无法获取 HttpServletRequest,异常日志记录不完整", e);
             return;
         }
 

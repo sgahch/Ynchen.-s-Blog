@@ -23,12 +23,6 @@ public interface TagService extends IService<Tag> {
      */
     List<TagVO> listAllTag();
 
-    /**
-     * 添加标签
-     * @param tagDTO 标签DTO
-     * @return 是否成功
-     */
-    ResponseResult<Void> addTag(TagDTO tagDTO);
 
     /**
      * 搜索标签

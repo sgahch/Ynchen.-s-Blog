@@ -46,7 +46,7 @@ public class TagController {
     @AccessLimit(seconds = 60, maxCount = 30)
     @PutMapping()
     public ResponseResult<Void> addTag(@RequestBody @Valid TagDTO tagDTO) {
-        return tagService.addTag(tagDTO);
+        return tagService.addOrUpdateTag(tagDTO);
     }
 
     @Operation(summary = "获取标签列表")

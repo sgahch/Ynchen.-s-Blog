@@ -55,6 +55,16 @@ const useWebsite = useWebsiteStore()
           <SvgIcon name="gitee_icon" width="20px" height="20px"/>
         </div>
       </a>
+      <a href="https://space.bilibili.com/3546574317684872?spm_id_from=333.1387.0.0" target="_blank">
+        <div class="icon-wrapper">
+          <SvgIcon name="bilibili_icon" width="20px" height="20px"/>
+        </div>
+      </a>
+      <a href="https://blog.csdn.net/2402_88603680?type=blog" target="_blank">
+        <div class="icon-wrapper">
+          <SvgIcon name="csdn_icon" width="20px" height="20px"/>
+        </div>
+      </a>
     </div>
   </div>
 </template>

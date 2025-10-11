@@ -27,4 +27,5 @@ public class WebsiteInfoDTO implements BaseData {
     private String recordInfo;
     //开始运行时间
     private Date startTime;
+
 }

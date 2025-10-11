@@ -3,11 +3,12 @@ import {createRouter, createWebHistory} from 'vue-router'
 import {constantRouter} from '@/router/routers.ts'
 import {GET_TOKEN} from "@/utils/auth.ts";
 
+
 let router = createRouter({
     // 路由模式 History
-    history: createWebHistory(),
+    history: createWebHistory('/blog'),
     routes: constantRouter
-})
+  })
 
 router.beforeEach((to, _from, next) => {
     // 用户是否登录

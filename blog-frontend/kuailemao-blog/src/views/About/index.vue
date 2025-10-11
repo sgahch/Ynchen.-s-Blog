@@ -20,18 +20,16 @@ const websiteStore = useWebsiteStore()
           <h1 :data-shadow='websiteStore.webInfo?.webmasterName'>{{ websiteStore.webInfo?.webmasterName }}</h1>
         </div>
         <div class="text-gray-600 w-full font-bold dark:text-gray-300 text-center">
-          人生如棋落子无悔道心稳固如箭离弦永不回头
+          I'm here waiting for u.
         </div>
       </div>
       <div class="flex flex-col justify-center items-center xl:w-[40%] lg:w-[60%] h-full">
         <div class="w-full h-[60vh] flex flex-col justify-center items-center">
           <div class="w-full text-[3rem] text-center text-gray-600 dark:text-gray-300 max-lg:text-[2rem] max-lg:pb-6">
-            一名中二Web全栈小白（前端更新版本v1.0）
+            一名中二Web全栈小白（前端更新版本v2.0）
           </div>
           <div class="mt-4 text-center text-gray-500 dark:text-gray-300 max-lg:px-3">
-            千年以前，看见元婴强者自己的小世界，非常羡慕，于是心中立誓，我也要变强，后抛弃世间情爱，终踏上修仙一途，虽一介散修，但亦往，经历千磨万难，
-            炼气百年，四百年筑基，一千年结丹，两千年突破元婴，又一千年后遭遇瓶颈，决心闭死关，四千年后的今日，终于突破<span class="text-red-500 font-bold"> 化神</span>，感叹回首沧桑，
-            道不尽仙凡殊途，尽人间。
+            Life is a movie with an unwritten script and no director, a chaotic mix of comedy, tragedy, and long, quiet scenes. So don't take any single act too seriously; the whole point is just to have some fun before the credits roll.
           </div>
         </div>
         <div class="w-full h-[40vh] flex flex-col justify-center items-center">
@@ -42,7 +40,7 @@ const websiteStore = useWebsiteStore()
                 <SvgIcon name="github_icon" width="100px" height="100px"/>
               </div>
             </a>
-            <a href="https://gitee.com/Ynchen666" target="_blank"  class="mx-10 max-lg:mx-4">
+            <a href="https://gitee.com/Ynchenhq" target="_blank"  class="mx-10 max-lg:mx-4">
               <div class="bg-white dark:bg-slate-800 w-[120px] h-[120px] flex justify-center items-center rounded-2xl drop-shadow-lg">
                 <SvgIcon name="gitee_icon" width="100px" height="100px"/>
               </div>
@@ -52,7 +50,7 @@ const websiteStore = useWebsiteStore()
                 <SvgIcon name="bilibili_icon" width="100px" height="100px"/>
               </div>
             </a>
-            <a href="https://blog.csdn.net/2402_88603680?type=blog" target="_blank">
+            <a href="https://blog.csdn.net/2402_88603680?type=blog" target="_blank" class="ml-10 max-lg:ml-4">
               <div class="bg-white dark:bg-slate-800 w-[120px] h-[120px] flex justify-center items-center rounded-2xl drop-shadow-lg">
                 <SvgIcon name="csdn_icon" width="100px" height="100px"/>
               </div>

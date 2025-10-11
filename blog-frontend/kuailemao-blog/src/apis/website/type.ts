@@ -12,9 +12,9 @@ export default interface WebsiteInfo {
     recordInfo: string;
     startTime: string;
     lastUpdateTime: string;
-    articleCount: number;
-    categoryCount: number;
-    commentCount: number;
-    wordCount: number;
-    visitCount: number;
+    articleCount: number;// 文章总数
+    categoryCount: number;// 分类总数
+    commentCount: number;// 评论总数
+    wordCount: number;// 文章总字数
+    visitCount: number;// 访问量
 }

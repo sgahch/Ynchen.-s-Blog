@@ -96,13 +96,16 @@ function userLogin() {
     </el-divider>
     <div>
       <div class="other_login">
+        <!-- Gitee 登录链接 -->
         <div>
-          <el-link :href="env.MODE === 'development' ? env.VITE_SERVE + '/oauth/gitee/render' : env.VITE_SERVE + '/api/oauth/gitee/render'">
+          <el-link href="/api/oauth/gitee/render">
             <svg-icon name="gitee" width="20px" height="20px" color="#4E86F1"/>
           </el-link>
         </div>
+
+        <!-- GitHub 登录链接 -->
         <div style="margin-left: 1rem">
-          <el-link :href="env.MODE === 'development' ? env.VITE_SERVE + '/oauth/github/render' : env.VITE_SERVE + '/api/oauth/github/render'">
+          <el-link href="/api/oauth/github/render">
             <svg-icon name="github" width="20px" height="20px" color="#4E86F1"/>
           </el-link>
         </div>
