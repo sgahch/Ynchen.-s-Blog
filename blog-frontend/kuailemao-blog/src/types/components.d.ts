@@ -74,10 +74,12 @@ declare module 'vue' {
     ScrollParallax: typeof import('./../components/ScrollParallax/index.vue')['default']
     Search: typeof import('./../components/Search/index.vue')['default']
     SideBar: typeof import('./../components/Layout/SideBar/index.vue')['default']
+    SiteVisitCard: typeof import('./../components/Card/SiteVisitCard/index.vue')['default']
     SvgIcon: typeof import('./../components/SvgIcon/index.vue')['default']
     TagListCard: typeof import('./../components/Card/TagListCard/index.vue')['default']
     TextGlitch: typeof import('./../components/TextGlitch/index.vue')['default']
     ToTop: typeof import('./../components/ToTop/index.vue')['default']
     Wave: typeof import('./../components/Wave/index.vue')['default']
+    WeatherLocationCard: typeof import('./../components/Card/WeatherLocationCard/index.vue')['default']
   }
 }

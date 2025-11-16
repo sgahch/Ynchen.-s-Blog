@@ -1,8 +1,11 @@
 <!-- 侧边栏 -->
 <template>
   <div>
-    <div>
+  <div>
       <InfoCard/>
+    </div>
+    <div>
+      <SiteVisitCard/>
     </div>
     <div>
       <Card title="公告" prefixIcon="announcement" suffix-icon="jt_y" :isDithering="true" :isArrow="true"
@@ -21,7 +24,7 @@
     <div>
       <TagListCard/>
     </div>
-    <ChargingList/>
+    <WeatherLocationCard/>
     <div>
       <Card title="每日鸡汤" prefix-icon="edit" suffix-icon="rotate" :isRotate="true" :isScale="true" @invoke="soupSub">
         <div class="soup-container">
@@ -50,6 +53,8 @@
 <script setup lang="ts">
 import InfoCard from '@/components/CardInfo/index.vue'
 import Card from '@/components/Card/index.vue'
+import SiteVisitCard from '@/components/Card/SiteVisitCard/index.vue'
+import WeatherLocationCard from '@/components/Card/WeatherLocationCard/index.vue'
 import {ref, onMounted} from 'vue'
 import {getSoup} from "@/apis/thirdParty";
 import useWebsiteStore from "@/store/modules/website.ts";

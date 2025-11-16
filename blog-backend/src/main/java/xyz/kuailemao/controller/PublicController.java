@@ -12,12 +12,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpServletRequest;
 import xyz.kuailemao.annotation.AccessLimit;
 import xyz.kuailemao.annotation.LogAnnotation;
 import xyz.kuailemao.constants.LogConst;
 import xyz.kuailemao.domain.response.ResponseResult;
+import xyz.kuailemao.domain.ip.IpDetail;
 import xyz.kuailemao.service.PublicService;
 import xyz.kuailemao.utils.ControllerUtils;
+import xyz.kuailemao.utils.IpUtils;
+import xyz.kuailemao.service.impl.IpServiceImpl;
 
 /**
  * @author kuailemao
@@ -50,6 +54,22 @@ public class PublicController {
             @RequestParam @Pattern(regexp = "(register|reset|resetEmail)",message = "邮箱类型错误" ) String type
     ) {
         return ControllerUtils.messageHandler(() -> publicService.registerEmailVerifyCode(type, email));
+    }
+
+    /**
+     * 获取客户端IP详情
+     */
+    @Operation(summary = "获取客户端IP详情")
+    @AccessLimit(seconds = 10, maxCount = 3)
+    @LogAnnotation(module="公共接口",operation= LogConst.GET)
+    @GetMapping("/ip/detail")
+    public ResponseResult<IpDetail> ipDetail(HttpServletRequest request) {
+        String ip = IpUtils.getIpAddr(request);
+        IpDetail detail = IpServiceImpl.getIpDetailOrNull(ip);
+        if (detail == null) {
+            detail = IpDetail.builder().ip(ip).country("未知").region("").city("").isp("").build();
+        }
+        return ResponseResult.success(detail);
     }
 
 }
