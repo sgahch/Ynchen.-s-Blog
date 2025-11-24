@@ -9,7 +9,7 @@ import {
   HomeFilled,
   Postcard,
   PriceTag,
-  Link, Setting, Promotion, ArrowDownBold, IceCreamRound, Close, PictureFilled
+  Link, Setting, Promotion, ArrowDownBold, IceCreamRound, Close, PictureFilled, ChatDotRound
 } from "@element-plus/icons-vue";
 import {logout} from "@/apis/user"
 import {REMOVE_TOKEN} from "@/utils/auth.ts";
@@ -195,6 +195,15 @@ onUnmounted(() => {
                 <Link/>
               </el-icon>
               <span>友链</span>
+            </span>
+          </div>
+
+          <div class="menus_item" @click="router.push('/ai')">
+            <span>
+              <el-icon>
+                <ChatDotRound/>
+              </el-icon>
+              <span>AI问答</span>
             </span>
           </div>
 

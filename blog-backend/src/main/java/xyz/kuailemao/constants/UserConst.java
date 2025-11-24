@@ -10,7 +10,7 @@ public class UserConst {
     /**
      * 用户默认头像
      */
-    public static final String DEFAULT_AVATAR = "https://image.kuailemao.xyz/blog/user/avatar/%E9%BB%98%E8%AE%A4%E5%A4%B4%E5%83%8F.svg";
+    public static final String DEFAULT_AVATAR = "http://8.148.31.90:9000/blog/user/avatar/954b4533-f361-4811-83d1-3c7ee267f4c1.jpg";
 
     /**
      * 用户默认性别

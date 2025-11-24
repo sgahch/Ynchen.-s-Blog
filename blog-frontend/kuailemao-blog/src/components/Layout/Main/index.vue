@@ -3,60 +3,65 @@ defineProps({
   // 内容区是否只需要父容器
   onlyFatherContainer: {
     type: Boolean,
-    default: false
+    default: false,
   },
   // 是否有侧边栏
   isSideBar: {
     type: Boolean,
-    default: false
+    default: false,
   },
   // 上边距
   marginTop: {
     type: String,
-    default: '0'
-  }
-})
+    default: "0",
+  },
+});
 </script>
 
 <template>
-
   <div class="header">
-    <slot name="header"/>
+    <slot name="header" />
   </div>
 
   <div v-if="onlyFatherContainer">
     <div>
-      <slot name="banner"/>
+      <slot name="banner" />
     </div>
-    <div class="is_banner_container" style="display: flex;justify-content: center">
+    <div
+      class="is_banner_container"
+      style="display: flex; justify-content: center"
+    >
       <!-- 内容区 -->
-      <div class="content_container" style="width: 100%;max-width: 100rem">
-        <slot name="content"/>
+      <div class="content_container" style="width: 100%; max-width: 100rem">
+        <slot name="content" />
       </div>
       <!-- 侧边栏 -->
       <div class="information_container" v-if="isSideBar">
-        <slot name="information"/>
+        <slot name="information" />
       </div>
     </div>
   </div>
 
-  <div class="div_container" :style="'margin-top:'+marginTop" v-if="!onlyFatherContainer">
+  <div
+    class="div_container"
+    :style="'margin-top:' + marginTop"
+    v-if="!onlyFatherContainer"
+  >
     <!-- 内容区 -->
     <div class="content_container">
-      <slot name="content"/>
+      <slot name="content" />
     </div>
     <!-- 侧边栏 -->
     <div class="information_container" v-if="isSideBar">
-      <slot name="information"/>
+      <slot name="information" />
     </div>
   </div>
   <div>
-    <slot name="footer"/>
+    <slot name="footer" />
   </div>
 </template>
 
 <style scoped lang="scss">
-
 .div_container {
   @media screen and (max-width: 1200px) {
     margin: 0;
@@ -83,7 +88,7 @@ defineProps({
   }
   padding: 1rem;
   background-color: var(--el-bg-color);
-  border-radius: .5em;
+  border-radius: 0.5em;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
@@ -112,7 +117,7 @@ defineProps({
 }
 
 .is_banner_container {
-  margin: 0 10%;
+  margin: 0 0;
   height: 100%;
   display: flex;
   padding-bottom: 2rem;

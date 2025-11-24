@@ -125,7 +125,7 @@ public class PublicServiceImpl implements PublicService {
      * @param map 存储邮件参数的 Map
      */
     private void setDefaultWebsiteInfo(Map<String, Object> map) {
-        map.putIfAbsent("webmasterAvatar", "https://image.kuailemao.xyz/blog/websiteInfo/avatar/default.jpg"); // 替换成你的默认头像URL
+        map.putIfAbsent("webmasterAvatar", "http://8.148.31.90:9000/blog/websiteInfo/avatar/9b474e04-6ac7-4679-9c46-2c7c07a64a39.jpg"); // 替换成你的默认头像URL
         map.putIfAbsent("websiteName", "我的博客网站"); // 替换成你的默认网站名称
     }
 }

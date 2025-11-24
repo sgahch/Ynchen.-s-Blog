@@ -6,7 +6,7 @@ import {
   Fries,
   HomeFilled,
   IceCreamRound,
-  Link, PictureFilled,
+  Link, PictureFilled, ChatDotRound,
   Postcard, PriceTag, UserFilled
 } from "@element-plus/icons-vue";
 import router from "@/router";
@@ -85,6 +85,13 @@ function isClose(){
           <Link/>
         </el-icon>
         友链
+      </el-menu-item>
+
+      <el-menu-item index="/ai" @click="isClose">
+        <el-icon>
+          <ChatDotRound/>
+        </el-icon>
+        AI问答
       </el-menu-item>
 
       <!-- 音乐菜单已移除 -->
