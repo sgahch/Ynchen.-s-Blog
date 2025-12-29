@@ -98,8 +98,13 @@ export default defineConfig(({ mode }: ConfigEnv) => {
                     target: `${loadEnv(mode, process.cwd()).VITE_SERVE}`,
                     changeOrigin: true,
                     rewrite: (path) => path.replace(/^\/api/, '')
+                },
+                // 网易云音乐API代理
+                '/wapi': {
+                    target: 'http://localhost:3000',
+                    changeOrigin: true,
+                    rewrite: (path) => path.replace(/^\/wapi/, '')
                 }
-
             }
         }
     }

@@ -18,6 +18,8 @@ import 'element-plus/dist/index.css'
 import 'element-plus/theme-chalk/dark/css-vars.css'
 // pinia
 import pinia from '@/store'
+
+import initMouseTrail from '@/utils/mouseTrail'
 // 全局指令
 import vSlideIn from '@/directives/vSlideIn.ts'
 import vLazy from '@/directives/vLazy.ts'
@@ -25,6 +27,7 @@ import vViewRequest from '@/directives/vViewRequest.ts'
 
 // 获取应用实例对象
 const app = createApp(App)
+initMouseTrail()
 app.directive('slide-in',vSlideIn)
 app.directive('lazy',vLazy)
 app.directive('view-request',vViewRequest)
